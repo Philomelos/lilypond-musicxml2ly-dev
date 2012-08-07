@@ -3,6 +3,9 @@ lilypond-musicxml2ly-dev
 
 A fork of musicxml2ly for philomelos.net
 
+v0.1.6:
+* fixed missing angled brackets in score-block. (bug was probably introduced in v0.1.5).
+
 v0.1.5:
 * new command line option --transpose c TOPITCH
 * barre symbol fixed

@@ -1891,7 +1891,7 @@ class StaffGroup:
         if self.stafftype:
             printer.dump ("\\new %s" % self.stafftype)
         self.print_ly_overrides (printer)
-#        printer.dump ("<<")
+        printer.dump ("<<")
         printer.newline ()
         if self.stafftype and self.instrument_name:
             printer.dump ("\\set %s.instrumentName = %s" % (self.stafftype,
@@ -1903,7 +1903,7 @@ class StaffGroup:
             printer.newline ()
         self.print_ly_contents (printer)
         printer.newline ()
-#        printer.dump (">>")
+        printer.dump (">>")
 #        printer.newline ()
         printer.dump (">>")
 #        printer.newline ()
