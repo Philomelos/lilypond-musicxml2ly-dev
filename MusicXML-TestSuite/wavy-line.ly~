@@ -1,0 +1,30 @@
+
+\version "2.15.14"
+% automatically converted by musicxml2ly from wavy-line.xml
+
+\header {
+    texidoc = "Wellige Linie"
+    title = "wavy-line"
+    }
+
+\layout {
+    \context { \Score
+        autoBeaming = ##f
+        }
+    }
+PartPOneVoiceOne =  \relative c'' {
+    \clef "treble" \key c \major c1 \startTrillSpan | % 2
+    \clef "treble" \key c \major c1 | % 3
+    \clef "treble" \key c \major c1 \stopTrillSpan }
+
+PartPOneVoiceOneLyricsOne =  \lyricmode { "wavy-line" "\"continue\""
+    "\"stop\"" }
+
+% The score definition
+\new Staff <<
+    \context Staff << 
+        \context Voice = "PartPOneVoiceOne" { \PartPOneVoiceOne }
+        \new Lyrics \lyricsto "PartPOneVoiceOne" \PartPOneVoiceOneLyricsOne
+        >>
+    >>
+

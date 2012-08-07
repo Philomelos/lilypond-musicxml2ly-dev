@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC
+    "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+    "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <work-title>single words with punctuation marks in score header lead to compilation failure</work-title>
+  <movement-title>Period:</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Compilation with LilyPond v2.15.14 fails when an element of the score header of a converted MusicXML-file contained a single word directly followed by a punctuation mark (I tested it with '.', '!', ','. There is no problem with question marks.). Solution: musicxml2ly should automatically enclose all titles and headers in quotation marks. (Currently only the ones containing white spaces and/or question marks are enclosed in quotation marks.)</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+  <part-list>
+    <score-part id="P1">
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

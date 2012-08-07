@@ -1,0 +1,3 @@
+musicxml2ly $1.xml
+lilypond $1.ly
+open $1.pdf

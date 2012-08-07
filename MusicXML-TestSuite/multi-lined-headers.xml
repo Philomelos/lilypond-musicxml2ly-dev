@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise version="2.0">
+    <movement-title>multi-lined headers collide</movement-title>
+    <identification>
+      <creator type="composer">John Francis Wade (1711–1786)</creator>
+      <creator type="lyricist">German: Friedrich Heinrich Ranke (1798–1876)
+Latin: John Francis Wade (1711–1786)</creator>
+        <miscellaneous>
+            <miscellaneous-field name="description">header elements containing several lines of text including line breaks are converted into single lines of text without line breaks, leading to text collisions.</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name></part-name>
+        </score-part>
+    </part-list>
+  <!--=========================================-->
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <key>
+                    <fifths>0</fifths>
+                    <mode>major</mode>
+                </key>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                </clef>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>4</duration>
+                <voice>1</voice>
+                <type>whole</type>
+            </note>
+        </measure>
+ </part>
+</score-partwise>

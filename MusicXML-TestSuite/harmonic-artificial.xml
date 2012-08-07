@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise version="2.0">
+  <movement-title>Artificial Harmonics</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Künstliche Flageoletts</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================-->
+  <part id="P1">
+    <measure number="1">
+      <note>
+        <pitch>
+          <step>C</step><octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <notations>
+          <technical><harmonic><artificial/></harmonic></technical>
+        </notations>
+        <lyric number="1"><text>artificial harmonics</text></lyric>
+      </note>
+    </measure>
+ </part>
+</score-partwise>

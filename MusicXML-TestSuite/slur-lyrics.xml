@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Soll eine Silbe unter einer Note stehen, an der ein 
+    Legatobogen endet bzw. die manuell mit der davor stehenden Note 
+    verbalkt wurde, dann kann dies über zwei Lösungsansätze erreicht 
+    werden:
+    1. In der .ly-Datei muss in der entsprechenden Notenvariable direkt 
+    vor der Note mit Liedtext, an der der Legatobogen beginnt, der Befehl 
+    \set melismaBusyProperties = #'()
+    (Setzt man den Befehl unmittelbar vor die Note mit Liedtext, auf der 
+    der Phrasierungsbogen endet, dann werden die beiden zusammengerückt 
+    und der Bindestrich geht verloren. Nicht erstrebenswert!). Zur 
+    Auflösung des Befehls sollte nach der übergebundenen Note mit 
+    Liedtext `\unset melismaBusyProperties` folgen.
+    2.In der .ly-Datei muss in der entsprechenden Liedtextvariable im 
+    \lyricmode direkt vor der Silbe, an der in den Noten der Legatobogen 
+    beginnt, der Befehl \set ignoreMelismata = ##t gesetzt werden. Zur 
+    Auflösung des Befehls sollte nach der Silbe auf der übergebundenen 
+    Note \unset melisma gesetzt werden.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+          <pitch>
+              <step>C</step>
+              <octave>5</octave>
+          </pitch>
+          <duration>8</duration>
+          <voice>1</voice>
+          <type>half</type>
+          <notations>
+            <slur type="start" number="1"/>
+          </notations>
+          <lyric number="1">
+            <syllabic>begin</syllabic>
+            <text>Syl</text>
+          </lyric>
+      </note>
+      <note>
+          <pitch>
+              <step>B</step>
+              <octave>4</octave>
+          </pitch>
+          <duration>8</duration>
+          <voice>1</voice>
+          <type>half</type>
+          <notations>
+            <slur type="stop" number="1"/>
+          </notations>
+          <lyric number="1">
+            <syllabic>middle</syllabic>
+            <text>la</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+          <pitch>
+              <step>C</step>
+              <octave>5</octave>
+          </pitch>
+          <duration>16</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <lyric number="1">
+            <syllabic>end</syllabic>
+            <text>ble</text>
+          </lyric>
+      </note>
+    </measure>
+  </part>
+  <!--=========================================================-->
+</score-partwise>

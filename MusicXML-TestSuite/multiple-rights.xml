@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise version="2.0">
+    <movement-title>multiple rights</movement-title>
+    <identification>
+      <rights type="music">Public Domain</rights>
+      <rights type="words">Public Domain</rights>
+      <rights type="arrangement">CC0</rights>
+        <miscellaneous>
+            <miscellaneous-field name="description">there can be multiple &lt;rights&gt; tags with or without one of the three values "music", "words" or "arrangement" in the identification element of a score. musicxml2ly dumps all of them in the LilyPond variable copyright without mentioning the type. The content of this variable is typeset in one line. This makes it impossible to tell which license applies to which type.</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name></part-name>
+        </score-part>
+    </part-list>
+  <!--=========================================-->
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <key>
+                    <fifths>0</fifths>
+                    <mode>major</mode>
+                </key>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                </clef>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>4</duration>
+                <voice>1</voice>
+                <type>whole</type>
+            </note>
+        </measure>
+ </part>
+</score-partwise>

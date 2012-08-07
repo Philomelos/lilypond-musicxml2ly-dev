@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC
+    "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+    "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <work-title>Missing MIDI-block</work-title>
+  <movement-title></movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">musicxml2ly v2.15.29 currently does not include a midi-block in the generated .ly-file when there is a part-group element. This is true for this file but not necessarily for other files.</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+  <part-list>
+
+    <part-group type="start" number="1">
+      <group-symbol>bracket</group-symbol>
+    </part-group>
+
+    <score-part id="P1">
+      <part-name>I1</part-name>
+      <midi-instrument id="P1-I1">
+        <midi-channel>0</midi-channel>
+        <midi-program>10</midi-program>
+      </midi-instrument>
+    </score-part>
+
+    <score-part id="P2">
+      <part-name>I2</part-name>
+      <midi-instrument id="P2-I1">
+        <midi-channel>0</midi-channel>
+        <midi-program>10</midi-program>
+      </midi-instrument>
+    </score-part>
+
+    <part-group type="stop" number="1"/>
+
+  </part-list>
+
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+
+
+  <part id="P2">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <type>whole</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>
+

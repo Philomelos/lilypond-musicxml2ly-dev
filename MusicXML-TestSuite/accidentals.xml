@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC
+    "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+    "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <movement-title>accidentals</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Akzidentien / Versetzungszeichen</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>1</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>1</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>sharp</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+          <pitch>
+              <step>F</step>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>natural</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>natural</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>-1</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>flat</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>flat</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="4">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>2</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>double-sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>double-sharp</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="5">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>2</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>sharp-sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>sharp-sharp</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="6">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>-2</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>flat-flat</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>flat-flat</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="7">
+      <attributes>
+        <key>
+          <fifths>-3</fifths>
+          <mode>major</mode>
+        </key>
+      </attributes>
+      <note>
+          <pitch>
+              <step>A</step>
+              <alter>1</alter>
+              <octave>4</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>natural-sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>natural-sharp</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="8">
+      <attributes>
+        <key>
+          <fifths>3</fifths>
+          <mode>major</mode>
+        </key>
+      </attributes>
+      <note>
+          <pitch>
+              <step>G</step>
+              <alter>-1</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>natural-flat</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>natural-flat</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="9">
+<!---->
+      <attributes>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+      </attributes>
+<!---->
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>-0.5</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>quarter-flat</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>quarter-flat</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="10">
+<!--
+      <attributes>
+        <key>
+          <fifths>-3</fifths>
+          <mode>major</mode>
+        </key>
+      </attributes>
+-->
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>0.5</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>quarter-sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>quarter-sharp</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="11">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>-1.5</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>three-quarters-flat</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>three-quarters-flat</text>
+          </lyric>
+      </note>
+    </measure>
+    <measure number="12">
+      <note>
+          <pitch>
+              <step>C</step>
+              <alter>1.5</alter>
+              <octave>5</octave>
+          </pitch>
+          <duration>4</duration>
+          <voice>1</voice>
+          <type>whole</type>
+          <accidental>three-quarters-sharp</accidental>
+          <lyric number="1">
+            <syllabic>single</syllabic>
+            <text>three-quarters-sharp</text>
+          </lyric>
+      </note>
+    </measure>
+
+  </part>
+</score-partwise>
