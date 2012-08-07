@@ -184,35 +184,26 @@ def extract_score_information (tree):
         if value:
             header.set_field (field, musicxml.escape_ly_output_string (value))
 
+    movement_title = tree.get_maybe_exist_named_child ('movement-title')
+    movement_number = tree.get_maybe_exist_named_child ('movement-number')
+    if movement_title:
+        set_if_exists ('title', movement_title.get_text ())
+    if movement_number:
+          set_if_exists ('movementnumber', movement_number.get_text ())
+
     work = tree.get_maybe_exist_named_child ('work')
     if work:
-        set_if_exists ('worknumber', work.get_work_number ())
-        set_if_exists ('opus', work.get_opus ())
-        set_if_exists ('title', work.get_work_title ())
+        work_number = work.get_work_number ()
         work_title = work.get_work_title ()
-    else:
-          return None
-
-    movement_title = tree.get_maybe_exist_named_child ('movement-title')
-
-    # use either work-title or movement-title as title.
-    # if work-title exists use work-title as title
-    # if both work-title and movement-title exist use work-title as title and
-    # movement-title as subtitle.
-    # if there is only a movement-title (or work-title is empty or missing) 
-    # the movement-title should be typeset as title
-    # if there is no <work>, <work-title> and <movement-title: do nothing
-    
-    if work and work_title:
-          set_if_exists ('title', work_title)
-    if movement_title and not work_title:
-          set_if_exists ('title', movement_title.get_text ())
-    if movement_title and work_title:
-          set_if_exists ('subtitle', movement_title.get_text ())
-          set_if_exists ('title', work_title)
-    if not work and not work_title and not movement_title:
-          return None
-
+        # Overwrite the title from movement-title with work->title
+        set_if_exists ('title', work.get_work_title ())
+        set_if_exists ('opus', work.get_work_number ())
+        # Use movement-title as subtitle
+        if movement_title:
+              set_if_exists ('subtitle', movement_title.get_text ())
+          
+# TODO: Translation of opus element. Not to be confused with opus in LilyPond. MusicXML opus is a document element for opus DTD
+ 
     identifications = tree.get_named_children ('identification')
     for ids in identifications:
         set_if_exists ('copyright', ids.get_rights ())
@@ -965,6 +956,7 @@ class RepeatMarker (Marker):
 class EndingMarker (Marker):
     pass
 
+
 # Convert the <barline> element to musicxml.BarLine (for non-standard barlines)
 # and to RepeatMarker and EndingMarker objects for repeat and
 # alternatives start/stops
@@ -1006,6 +998,7 @@ def musicxml_barline_to_lily (barline):
             retval[4] = ending
         else:
             retval[0] = ending
+      # TODO. ending number=""
 
     if bartype:
         b = musicexp.BarLine ()
@@ -1215,28 +1208,28 @@ articulations_dict = {
 articulation_spanners = [ "wavy-line" ]
 
 def OrnamenthasWhat(mxl_event):
-    wavy=trilly=ignore=start=stop=False
+    wavy = trilly = ignore = start = stop = False
     for i in mxl_event._parent._children:
-            if i._name=="wavy-line": wavy=True
-            elif i._name=="trill-mark": trilly=True
+            if i._name == "wavy-line": wavy = True
+            elif i._name == "trill-mark": trilly = True
             try:
-                if i.type=="continue": ignore=True
-                elif i.type=="start": start=True
-                elif i.type=="stop": stop=True
+                if i.type == "continue": ignore = True
+                elif i.type == "start": start = True
+                elif i.type == "stop": stop = True
             except:
                 pass
-    if start== True:
-        if wavy==True and trilly==False: musicexp.whatOrnament="wave"
-        else: musicexp.whatOrnament="trill"
-    if ignore== True: return "ignore"
-    elif stop==True: return "stop"
-    elif wavy == True and trilly==True: return "trill and wave"
-    elif wavy==True: return "wave"
-    elif trilly==True: return "trill"
+    if start == True:
+        if wavy == True and trilly == False: musicexp.whatOrnament = "wave"
+        else: musicexp.whatOrnament = "trill"
+    if ignore == True: return "ignore"
+    elif stop == True: return "stop"
+    elif wavy == True and trilly == True: return "trill and wave"
+    elif wavy == True: return "wave"
+    elif trilly == True: return "trill"
 
 def OrnamenthasWavyline(mxl_event):
     for i in mxl_event._parent._children:
-            if i._name=="wavy-line": return True
+            if i._name == "wavy-line": return True
     return False
 
             
@@ -1471,6 +1464,8 @@ def next_non_hash_index (lst, pos):
         pos += 1
     return pos
 
+
+
 def musicxml_metronome_to_ly (mxl_event):
     children = mxl_event.get_all_children ()
     if not children:
@@ -1550,7 +1545,7 @@ def musicxml_direction_to_lily (n):
         dirtype_children += dt.get_all_children ()
 
     for entry in dirtype_children:
-        # backets, dashes, octave shifts. pedal marks, hairpins etc. are spanners:
+        # brackets, dashes, octave shifts. pedal marks, hairpins etc. are spanners:
         if entry.get_name() in directions_spanners:
             event = musicxml_spanner_to_lily_event (entry)
             if event:
@@ -2725,7 +2720,8 @@ information.""") % 'lilypond')
                   default=False,
                   dest="midi",
                   help=_("add midi-block to .ly file"))
-# new transpose function
+    
+    # transpose function
     p.add_option ('--transpose',
                   metavar=_ ("TOPITCH"),
                   action="store",
@@ -3000,7 +2996,8 @@ def main ():
 
     if options.midi:
         musicexp.set_create_midi (options.midi)
-# new transpose function
+
+    # transpose function
     if options.transpose:
         musicexp.set_transpose (options.transpose)
 

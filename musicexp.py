@@ -12,7 +12,7 @@ from rational import Rational
 # Store previously converted pitch for \relative conversion as a global state variable
 previous_pitch = None
 relative_pitches = False
-whatOrnament=""
+whatOrnament = ""
 
 def escape_instrument_string (input_string):
     retstring = string.replace (input_string, "\"", "\\\"")
@@ -57,7 +57,7 @@ class Output_printer:
 
     def dump_version (self):
         self.newline ()
-        self.print_verbatim ('\\version "2.15.37"')
+        self.print_verbatim ('\\version "2.15.41"')
         self.newline ()
 
     def get_indent (self):
@@ -2015,6 +2015,7 @@ class Score:
         if self.contents:
           self.contents.set_part_information (part_id, staves_info)
 
+
     def print_ly (self, printer):
         self.create_midi = get_create_midi ()
         printer.dump ("\\score {");
@@ -2027,8 +2028,8 @@ class Score:
             printer.dump ("% To create MIDI output, uncomment the following line:");
             printer.newline ();
             printer.dump ("% ");
-        printer.dump ("\\midi {\\tempo 4 = 100}");
-#        print musicxml.Sound.tempo;
+            
+        printer.dump ("\\midi {\\tempo 4 = 100 }");
         printer.newline ()
         printer.dump ("}");
         printer.newline ()

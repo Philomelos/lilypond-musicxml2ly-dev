@@ -156,8 +156,8 @@ class Work (Xml_node):
         return self.get_work_information ('work-title')
     def get_work_number (self):
         return self.get_work_information ('work-number')
-    def get_opus (self):
-        return self.get_work_information ('opus')
+#    def get_opus (self):
+#        return self.get_work_information ('opus')
 
 class Identification (Xml_node):
     def get_rights (self):
@@ -554,13 +554,6 @@ class Lyric (Music_xml_node):
             return self.number
         else:
             return -1
-
-class Sound (Music_xml_node):
-    def get_number (self):
-        if hasattr (self, 'number'):
-            tempo == self.number
-        else:
-            return None
 
 class Musicxml_voice:
     def __init__ (self):
