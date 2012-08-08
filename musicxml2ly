@@ -2842,7 +2842,7 @@ def update_score_setup (score_structure, part_list, voices, parts):
     score_structure.set_tempo('100')
     if len(sounds) != 0:
         for sound in sounds:
-            if hasattr(sound, 'tempo'):
+            if (sound.get_tempo() != None and sound.get_tempo() != ""):
                 score_structure.set_tempo(sound.get_tempo())
                 break
 
