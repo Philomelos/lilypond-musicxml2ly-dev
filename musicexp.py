@@ -2015,6 +2015,8 @@ class Score:
         if self.contents:
           self.contents.set_part_information (part_id, staves_info)
 
+    def set_tempo (self, tempo):
+        self.tempo = tempo
 
     def print_ly (self, printer):
         self.create_midi = get_create_midi ()
@@ -2029,7 +2031,7 @@ class Score:
             printer.newline ();
             printer.dump ("% ");
             
-        printer.dump ("\\midi {\\tempo 4 = 100 }");
+        printer.dump ("\\midi {\\tempo 4 = "+self.tempo+" }");
         printer.newline ()
         printer.dump ("}");
         printer.newline ()

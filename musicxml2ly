@@ -2803,7 +2803,7 @@ def format_staff_info (part_id, staff_id, raw_voices):
         voices.append ([voice_name, voice_lyrics, figured_bass_name, chordnames_name])
     return [staff_id, voices]
 
-def update_score_setup (score_structure, part_list, voices):
+def update_score_setup (score_structure, part_list, voices, parts):
 
     for part_definition in part_list:
         part_id = part_definition.id
@@ -2831,6 +2831,21 @@ def update_score_setup (score_structure, part_list, voices):
                 for (voice_name, voice) in nv_dict.items ()]
             staves_info.append (format_staff_info (part_id, None, thisstaff_raw_voices))
         score_structure.set_part_information (part_id, staves_info)
+        
+    sounds = []
+    for part in parts:
+        for measure in part.get_typed_children(musicxml.Measure):
+            for direction in measure.get_typed_children(musicxml.Direction):
+                for sound in direction.get_typed_children(musicxml.Sound):
+                    sounds.append(sound)
+                    
+    score_structure.set_tempo('100')
+    if len(sounds) != 0:
+        for sound in sounds:
+            if hasattr(sound, 'tempo'):
+                score_structure.set_tempo(sound.get_tempo())
+                break
+
 
 # Set global values in the \layout block, like auto-beaming etc.
 def update_layout_information ():
@@ -2932,7 +2947,7 @@ def convert (filename, options):
         part_list = mxl_pl.get_named_children ("score-part")
 
     # score information is contained in the <work>, <identification> or <movement-title> tags
-    update_score_setup (score, part_list, voices)
+    update_score_setup (score, part_list, voices, parts)
     # After the conversion, update the list of settings for the \layout block
     update_layout_information ()
 

@@ -555,6 +555,13 @@ class Lyric (Music_xml_node):
         else:
             return -1
 
+class Sound (Music_xml_node):
+    def get_tempo (self):
+        if hasattr (self, 'tempo'):
+            return self.tempo
+        else:
+            return None
+
 class Musicxml_voice:
     def __init__ (self):
         self._elements = []
@@ -1209,7 +1216,7 @@ class_dict = {
         'note': Note,
         'octave-shift': Octave_shift,
         'part': Part,
-    'part-group': Part_group,
+        'part-group': Part_group,
         'part-list': Part_list,
         'pedal': Pedal,
         'per-minute': PerMinute,
@@ -1220,6 +1227,7 @@ class_dict = {
         'score-part': Score_part,
         'slide': Slide,
         'slur': Slur,
+        'sound': Sound,
         'staff': Staff,
         'syllabic': Syllabic,
         'text': Text,
