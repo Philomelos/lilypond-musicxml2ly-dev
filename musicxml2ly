@@ -2835,6 +2835,8 @@ def update_score_setup (score_structure, part_list, voices, parts):
     sounds = []
     for part in parts:
         for measure in part.get_typed_children(musicxml.Measure):
+            for sound in measure.get_typed_children(musicxml.Sound):
+                sounds.append(sound)
             for direction in measure.get_typed_children(musicxml.Direction):
                 for sound in direction.get_typed_children(musicxml.Sound):
                     sounds.append(sound)
