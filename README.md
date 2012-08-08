@@ -3,6 +3,10 @@ lilypond-musicxml2ly-dev
 
 A fork of musicxml2ly for philomelos.net
 
+v0.1.7:
+* added sound tempo recognition for midi output
+* added support for standalone sound elements
+
 v0.1.6:
 * fixed missing angled brackets in score-block. (bug was probably introduced in v0.1.5).
 
@@ -21,9 +25,9 @@ power chords. This command is required to print e.g. C5.
 
 v0.1.3:
 * wavy-line bug fixed:
- * <wavy-line> --> \override TextSpanner #'style = #'trill
- * <trill-mark/> + <wavy-line/> --> \startTrillSpan ... \stopTrillSpan
- * <trill-mark/> --> \trill
+ * &lt;wavy-line&gt; --> \override TextSpanner #'style = #'trill
+ * &lt;trill-mark/&gt; + &lt;wavy-line/&gt; --> \startTrillSpan ... \stopTrillSpan
+ * &lt;trill-mark/&gt; --> \trill
 
 v0.1.2:
 * placement attributes for musical directions now work for dynamics, hairpins, textspans and ligature brackets
