@@ -51,10 +51,10 @@ class Xml_node:
         self._name = 'xml_node'
         self._parent = None
         self._attribute_dict = {}
-        
+
     def get_parent (self):
         return self._parent
-    
+
     def is_first (self):
         return self._parent.get_typed_children (self.__class__)[0] == self
 
@@ -79,7 +79,7 @@ class Xml_node:
         while p:
             ly.progress ('  In: <%s %s>\n' % (p._name, ' '.join (['%s=%s' % item for item in p._attribute_dict.items ()])))
             p = p.get_parent ()
-        
+
     def dump (self, indent=''):
         ly.debug_output ('%s<%s%s>' % (indent, self._name, ''.join ([' %s=%s' % item for item in self._attribute_dict.items ()])))
         non_text_children = [c for c in self._children if not isinstance (c, Hash_text)]
@@ -91,7 +91,7 @@ class Xml_node:
             ly.debug_output (indent)
         ly.debug_output ('</%s>\n' % self._name)
 
-        
+
     def get_typed_children (self, klass):
         if not klass:
             return []
@@ -151,7 +151,7 @@ class Work (Xml_node):
             return wt.get_text ()
         else:
             return ''
-      
+
     def get_work_title (self):
         return self.get_work_information ('work-title')
     def get_work_number (self):
@@ -203,7 +203,7 @@ class Identification (Xml_node):
             return v
         v = self.get_creator ('poet')
         return v
-    
+
     def get_encoding_information (self, type):
         enc = self.get_named_children ('encoding')
         if enc:
@@ -212,7 +212,7 @@ class Identification (Xml_node):
                 return children[0].get_text ()
         else:
             return None
-      
+
     def get_encoding_software (self):
         return self.get_encoding_information ('software')
     def get_encoding_date (self):
@@ -221,7 +221,7 @@ class Identification (Xml_node):
         return self.get_encoding_information ('encoder')
     def get_encoding_description (self):
         return self.get_encoding_information ('encoding-description')
-    
+
     def get_encoding_software_list (self):
         enc = self.get_named_children ('encoding')
         software = []
@@ -310,17 +310,17 @@ class Attributes (Measure_element):
             return cn[0] == self._original_tag
         else:
             return cn[0] == self
-    
+
     def set_attributes_from_previous (self, dict):
         self._dict.update (dict)
-        
+
     def read_self (self):
         for c in self.get_all_children ():
             self._dict[c.get_name()] = c
 
     def get_named_attribute (self, name):
         return self._dict.get (name)
-        
+
     def single_time_sig_to_fraction (self, sig):
         if len (sig) < 2:
             return 0
@@ -343,7 +343,7 @@ class Attributes (Measure_element):
            # Simple (maybe compound) time signature of the form (beat, ..., type)
             return self.single_time_sig_to_fraction (sig)
         return 0
-        
+
     def get_time_signature (self):
         "Return time sig as a (beat, beat-type) tuple. For compound signatures,"
         "return either (beat, beat,..., beat-type) or ((beat,..., type), "
@@ -550,6 +550,12 @@ class Text (Music_xml_node):
 
 class Lyric (Music_xml_node):
     def get_number (self):
+	"""
+	Return the number attribute (if it exists) of the sound element.
+
+	@rtype: number
+	@return: The value of the number attribute
+	"""
         if hasattr (self, 'number'):
             return self.number
         else:
@@ -557,6 +563,13 @@ class Lyric (Music_xml_node):
 
 class Sound (Music_xml_node):
     def get_tempo (self):
+	"""
+	Return the tempo attribute (if it exists) of the sound element.
+	This attribute can be used by musicxml2ly for the midi output (see L{musicexp.Score}).
+
+	@rtype: string
+	@return: The value of the tempo attribute
+	"""
         if hasattr (self, 'tempo'):
             return self.tempo
         else:
@@ -1296,7 +1309,7 @@ def minidom_demarshal_node (node):
         for (nm, value) in node.attributes.items ():
             py_node.__dict__[nm] = value
             py_node._attribute_dict[nm] = value
-            
+
     py_node._data = None
     if node.nodeType == node.TEXT_NODE and node.data:
         py_node._data = node.data
@@ -1307,7 +1320,7 @@ def minidom_demarshal_node (node):
 
 if __name__ == '__main__':
     import lxml.etree
-        
+
     tree = lxml.etree.parse ('beethoven.xml')
     mxl_tree = lxml_demarshal_node (tree.getroot ())
     ks = class_dict.keys ()

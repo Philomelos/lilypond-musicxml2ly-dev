@@ -3,6 +3,7 @@ import inspect
 import sys
 import string
 import re
+import math
 import lilylib as ly
 
 _ = ly._
@@ -36,12 +37,10 @@ class Output_stack_element:
         return o
 
 class Output_printer:
-
-    """A class that takes care of formatting (eg.: indenting) a
-    Music expression as a .ly file.
-
     """
-
+    A class that takes care of formatting (eg.: indenting) a
+    Music expression as a .ly file.
+    """
     def __init__ (self):
         self._line = ''
         self._indent = 4
@@ -207,13 +206,24 @@ class Duration:
 
         return base * dot_fact * self.factor
 
-# implement the midi command line option '-m' and '--midi'
-# if TRUE add midi-block to .ly file (see below)
 def set_create_midi (option):
+    """
+    Implement the midi command line option '-m' and '--midi'.
+    If True, add midi-block to .ly file (see L{musicexp.Score.print_ly}).
+
+    @param option: Indicates whether the midi-block has to be added or not.
+    @type option: boolean
+    """
     global midi_option
     midi_option = option
 
 def get_create_midi ():
+    """
+    Return, if exists the state of the midi-option.
+
+    @return: The state of the midi-option.
+    @rtype: boolean
+    """
     try:
         return midi_option
     except:
@@ -974,7 +984,7 @@ class SpanEvent (Event):
         self.span_direction = 0 # start/stop
         self.line_type = 'solid'
         self.span_type = 0 # e.g. cres/decrescendo, ottava up/down
-        self.size = 0 # size of e.g. ocrave shift
+        self.size = 0 # size of e.g. octave shift
     def wait_for_note (self):
         return True
     def get_properties(self):
@@ -1566,6 +1576,25 @@ class TimeSignatureChange (Music):
         Music.__init__ (self)
         self.fractions = [4, 4]
         self.style = None
+        # Used for the --time-signature option of musicxml2ly
+        self.originalFractions = None
+
+    def get_fractions_ratio (self):
+	"""
+	Calculate the ratio between the original time fraction and the new one.
+	Used for the "--time-signature" option.
+
+	@return: The ratio between the two time fractions.
+	@rtype: float
+	"""
+	return (float(self.originalFractions[0])/self.originalFractions[1])*(float(self.fractions[1])/self.fractions[0])
+
+    def get_shift_duration_parameters (self):
+	dur = math.ceil(math.log(self.get_fractions_ratio(),2))
+	dots = (1/self.get_fractions_ratio())/(math.pow(2,-dur))
+	dots = int(math.log(2-dots,0.5))
+	return (dur, dots)
+
     def format_fraction (self, frac):
         if isinstance (frac, list):
             l = [self.format_fraction (f) for f in frac]
@@ -1589,7 +1618,11 @@ class TimeSignatureChange (Music):
 
         # Easy case: self.fractions = [n,d] => normal \time n/d call:
         if len (self.fractions) == 2 and isinstance (self.fractions[0], int):
-            return st + '\\time %d/%d ' % tuple (self.fractions)
+	    st += '\\time %d/%d ' % tuple (self.fractions)
+            if self.originalFractions != None:
+		return st + '\\shiftDurations #%d #%d {' % tuple(self.get_shift_duration_parameters())
+	    else:
+		return st
         elif self.fractions:
             return st + "\\compoundMeter #'%s" % self.format_fraction (self.fractions)
         else:
@@ -2005,6 +2038,9 @@ class RhythmicStaff (Staff):
 
 class Score:
     def __init__ (self):
+	"""
+	Constructs a new Score object.
+	"""
         self.contents = None
         self.create_midi = False
 
@@ -2016,26 +2052,43 @@ class Score:
           self.contents.set_part_information (part_id, staves_info)
 
     def set_tempo (self, tempo):
+	"""
+	Set the tempo attribute of the Score.
+	This attribute can be used in L{print_ly} for the midi output (see L{musicxml.Sound}).
+
+	@param tempo: The value of the tempo, in beats per minute.
+	@type tempo: String
+	"""
         self.tempo = tempo
 
     def print_ly (self, printer):
+	"""
+	Print the content of the score to the printer, in lilypond format.
+
+	@param printer: A printer given to display correctly the output.
+	@type printer: L{Output_printer<musicexp.Output_printer>}
+	"""
         self.create_midi = get_create_midi ()
-        printer.dump ("\\score {");
+        printer.dump ("\\score {")
         printer.newline ()
         if self.contents:
-            self.contents.print_ly (printer);
-        printer.dump ("\\layout {}");
+            self.contents.print_ly (printer)
+        printer.dump ("\\layout {}")
         printer.newline ()
+        # If the --midi option was not passed to musicxml2ly, that comments the "midi" line
         if not self.create_midi:
-            printer.dump ("% To create MIDI output, uncomment the following line:");
-            printer.newline ();
-            printer.dump ("% ");
-            
-        printer.dump ("\\midi {\\tempo 4 = "+self.tempo+" }");
+            printer.dump ("% To create MIDI output, uncomment the following line:")
+            printer.newline ()
+            printer.dump ("% ")
+        printer.dump ("\\midi {\\tempo 4 = "+self.tempo+" }")
         printer.newline ()
-        printer.dump ("}");
+        printer.dump ("}")
         printer.newline ()
 
+class EndBlockEvent (Event):
+    def print_ly (self, printer):
+	printer.dump ("}")
+	printer.newline()
 
 def test_pitch ():
     bflat = Pitch()
@@ -2146,4 +2199,3 @@ if __name__ == '__main__':
         return ok
 
     print expr.lisp_sub_expression(sub)
-

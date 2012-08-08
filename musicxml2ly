@@ -755,10 +755,16 @@ def musicxml_clef_to_lily (attributes):
     return change
 
 def musicxml_time_to_lily (attributes):
-    sig = attributes.get_time_signature ()
+    change = musicexp.TimeSignatureChange()
+    # time signature function
+    if options.time_signature:
+	tmp_sig = options.time_signature.split("/",1)
+	sig = [int(tmp_sig[0]), int(tmp_sig[1])]
+	change.originalFractions = attributes.get_time_signature ()
+    else:
+	sig = attributes.get_time_signature ()
     if not sig:
         return None
-    change = musicexp.TimeSignatureChange()
     change.fractions = sig
 
     time_elm = attributes.get_maybe_exist_named_child ('time')
@@ -1870,7 +1876,7 @@ def musicxml_note_to_lily_main_event (n):
 
     if event:
         event.duration = musicxml_duration_to_lily (n)
-        
+
 #    if hasattr(n, 'color'):
 #        event.color = hex_to_color(n.color)
 
@@ -2076,6 +2082,9 @@ class LilyPondVoiceBuilder:
         evc = musicexp.ChordEvent ()
         self.elements.append (evc)
 
+    def add_end_block (self):
+	ev = musicexp.EndBlockEvent ()
+	self.elements.append (ev)
 
 class VoiceData:
     def __init__ (self):
@@ -2476,6 +2485,8 @@ def musicxml_voice_to_lily_voice (voice):
 
     ## force trailing mm rests to be written out.
     voice_builder.add_music (musicexp.ChordEvent (), Rational (0))
+    if options.time_signature:
+	voice_builder.add_end_block()
 
     ly_voice = group_tuplets (voice_builder.elements, tuplet_events)
     ly_voice = group_repeats (ly_voice)
@@ -2725,7 +2736,15 @@ information.""") % 'lilypond')
     p.add_option ('--transpose',
                   metavar=_ ("TOPITCH"),
                   action="store",
-                  help=_ ("set pitch to transpose by the interval between pitch c and TOPITCH"))
+                  dest="transpose",
+                  help=_ ("set pitch to transpose by the interval between pitch 'c' and TOPITCH"))
+
+    # time signature changing function
+    p.add_option ('--ts', '--time-signature',
+                  metavar=_ ("BEATS/BEATTYPE"),
+                  action="store",
+                  dest="time_signature",
+                  help=_ ("set the time signature to make the score look faster or slower, (eg. '4/4' or '6/8')"))
 
     p.add_option_group ('',
                         description=(
@@ -2831,7 +2850,7 @@ def update_score_setup (score_structure, part_list, voices, parts):
                 for (voice_name, voice) in nv_dict.items ()]
             staves_info.append (format_staff_info (part_id, None, thisstaff_raw_voices))
         score_structure.set_part_information (part_id, staves_info)
-        
+
     sounds = []
     for part in parts:
         for measure in part.get_typed_children(musicxml.Measure):
@@ -2840,7 +2859,7 @@ def update_score_setup (score_structure, part_list, voices, parts):
             for direction in measure.get_typed_children(musicxml.Direction):
                 for sound in direction.get_typed_children(musicxml.Sound):
                     sounds.append(sound)
-                    
+
     score_structure.set_tempo('100')
     if len(sounds) != 0:
         for sound in sounds:
@@ -3011,6 +3030,7 @@ def main ():
         opt_parser.print_usage()
         sys.exit (2)
 
+    # midi-block option
     if options.midi:
         musicexp.set_create_midi (options.midi)
 
