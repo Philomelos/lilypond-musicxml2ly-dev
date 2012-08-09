@@ -1577,7 +1577,7 @@ class TimeSignatureChange (Music):
         self.fractions = [4, 4]
         self.style = None
         # Used for the --time-signature option of musicxml2ly
-        self.originalFractions = None
+        self.originalFractions = [4, 4]
 
     def get_fractions_ratio (self):
 	"""
@@ -1589,11 +1589,11 @@ class TimeSignatureChange (Music):
 	"""
 	return (float(self.originalFractions[0])/self.originalFractions[1])*(float(self.fractions[1])/self.fractions[0])
 
-    def get_shift_duration_parameters (self):
+    def get_shift_durations_parameters (self):
 	dur = math.ceil(math.log(self.get_fractions_ratio(),2))
 	dots = (1/self.get_fractions_ratio())/(math.pow(2,-dur))
 	dots = int(math.log(2-dots,0.5))
-	return (dur, dots)
+	return [dur, dots]
 
     def format_fraction (self, frac):
         if isinstance (frac, list):
@@ -1618,11 +1618,7 @@ class TimeSignatureChange (Music):
 
         # Easy case: self.fractions = [n,d] => normal \time n/d call:
         if len (self.fractions) == 2 and isinstance (self.fractions[0], int):
-	    st += '\\time %d/%d ' % tuple (self.fractions)
-            if self.originalFractions != None:
-		return st + '\\shiftDurations #%d #%d {' % tuple(self.get_shift_duration_parameters())
-	    else:
-		return st
+	    return st + '\\time %d/%d ' % tuple (self.fractions)
         elif self.fractions:
             return st + "\\compoundMeter #'%s" % self.format_fraction (self.fractions)
         else:
@@ -2085,10 +2081,17 @@ class Score:
         printer.dump ("}")
         printer.newline ()
 
-class EndBlockEvent (Event):
-    def print_ly (self, printer):
-	printer.dump ("}")
-	printer.newline()
+class ShiftDurations (MusicWrapper):
+    def __init__ (self):
+        MusicWrapper.__init__ (self)
+	self.params = [0,0]
+
+    def set_shift_durations_parameters(self, timeSigChange):
+	self.params = timeSigChange.get_shift_durations_parameters()
+
+    def print_ly (self, func):
+        func (' \\shiftDurations #%d #%d ' % tuple(self.params))
+        MusicWrapper.print_ly (self, func)
 
 def test_pitch ():
     bflat = Pitch()

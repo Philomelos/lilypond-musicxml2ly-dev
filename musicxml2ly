@@ -704,8 +704,7 @@ def group_tuplets (music_list, events):
     """Collect Musics from
     MUSIC_LIST demarcated by EVENTS_LIST in TimeScaledMusic objects.
     """
-
-
+    
     indices = []
     brackets = {}
 
@@ -2082,10 +2081,6 @@ class LilyPondVoiceBuilder:
         evc = musicexp.ChordEvent ()
         self.elements.append (evc)
 
-    def add_end_block (self):
-	ev = musicexp.EndBlockEvent ()
-	self.elements.append (ev)
-
 class VoiceData:
     def __init__ (self):
         self.voicename = None
@@ -2486,7 +2481,11 @@ def musicxml_voice_to_lily_voice (voice):
     ## force trailing mm rests to be written out.
     voice_builder.add_music (musicexp.ChordEvent (), Rational (0))
     if options.time_signature:
-	voice_builder.add_end_block()
+	for event in voice_builder.elements:
+	    if isinstance(event, musicexp.TimeSignatureChange):
+		sd = musicexp.ShiftDurations ()
+		sd.set_shift_durations_parameters (event)
+		break;
 
     ly_voice = group_tuplets (voice_builder.elements, tuplet_events)
     ly_voice = group_repeats (ly_voice)
@@ -2506,6 +2505,11 @@ def musicxml_voice_to_lily_voice (voice):
 
     if len (modes_found) > 1:
        ly.warning (_ ('cannot simultaneously have more than one mode: %s') % modes_found.keys ())
+
+
+    if options.time_signature:
+        sd.element = seq_music
+        seq_music = sd
 
     if options.relative:
         v = musicexp.RelativeMusic ()
