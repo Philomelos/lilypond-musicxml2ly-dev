@@ -551,7 +551,7 @@ class Text (Music_xml_node):
 class Lyric (Music_xml_node):
     def get_number (self):
 	"""
-	Return the number attribute (if it exists) of the sound element.
+	Return the number attribute (if it exists) of the lyric element.
 
 	@rtype: number
 	@return: The value of the number attribute
