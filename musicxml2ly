@@ -9,7 +9,6 @@ import codecs
 import zipfile
 import tempfile
 import StringIO
-import copy
 
 """
 
