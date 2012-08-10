@@ -9,6 +9,7 @@ import codecs
 import zipfile
 import tempfile
 import StringIO
+import copy
 
 """
 
@@ -2483,8 +2484,10 @@ def musicxml_voice_to_lily_voice (voice):
     if options.time_signature:
 	for event in voice_builder.elements:
 	    if isinstance(event, musicexp.TimeSignatureChange):
-		sd = musicexp.ShiftDurations ()
-		sd.set_shift_durations_parameters (event)
+		sd = []
+		for i in range(0,3):
+		    sd.append(musicexp.ShiftDurations ())
+		    sd[i].set_shift_durations_parameters (event)
 		break;
 
     ly_voice = group_tuplets (voice_builder.elements, tuplet_events)
@@ -2508,8 +2511,9 @@ def musicxml_voice_to_lily_voice (voice):
 
 
     if options.time_signature:
-        sd.element = seq_music
-        seq_music = sd
+        sd[-1].element = seq_music
+        seq_music = sd[-1]
+        sd.pop()
 
     if options.relative:
         v = musicexp.RelativeMusic ()
@@ -2531,6 +2535,10 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'figuremode'
         v.element = fbass_music
+	if options.time_signature:
+	    sd[-1].element = v
+	    v = sd[-1]
+	    sd.pop()
         return_value.figured_bass = v
 
     # create \chordmode { chords }
@@ -2540,6 +2548,10 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'chordmode'
         v.element = cname_music
+	if options.time_signature:
+	    sd[-1].element = v
+	    v = sd[-1]
+	    sd.pop()
         return_value.chordnames = v
 
     return return_value
