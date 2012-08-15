@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise version="2.0">
+  <movement-title>stem values</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">stem values up, down, double and none.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <stem>down</stem>
+        <type>quarter</type>
+        <lyric number="1"><text>down</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <stem>up</stem>
+        <type>quarter</type>
+        <lyric number="1"><text>up</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <stem>double</stem>
+        <type>quarter</type>
+        <lyric number="1"><text>double</text></lyric>
+      </note>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <stem>none</stem>
+        <type>quarter</type>
+        <lyric number="1"><text>none</text></lyric>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

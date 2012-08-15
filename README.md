@@ -3,6 +3,25 @@ lilypond-musicxml2ly-dev
 
 A fork of musicxml2ly for philomelos.net
 
+v0.1.11:
+* implemented recognition of stem values "up" and "down"
+* removed temporary files (MusicXML-Testsuite)
+* added minimal example for stem values (stem.xml) to MusicXML-Testsuite.
+
+v0.1.10:
+* removed unused "copy" inclusion
+* fixed the ShiftDurations use in main script to wrap voices, chordmode anf figuremode
+
+v0.1.9:
+* fixed a documentation mistake in musicxml.py
+* changed the --time-signature option behaviour because of conflicts with repeated music, for example (made a new ShiftDurations class that inherits from MusicWrapper)
+
+v0.1.8:
+* fixed a bug when the sound attribute "tempo" is defined but empty
+* added support for standalone sound elements
+* added the --time-signature command line option to make the music look faster/slower
+* added extended version of Kainhofer's MusicXML-Testsuite
+
 v0.1.7:
 * added sound tempo recognition for midi output
 * added support for standalone sound elements

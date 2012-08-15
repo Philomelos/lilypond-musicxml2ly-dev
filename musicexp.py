@@ -1306,6 +1306,23 @@ class ParenthesizeEvent (FunctionWrapperEvent):
     def __init__ (self):
         FunctionWrapperEvent.__init__ (self, "parenthesize")
 
+class StemEvent (Event):
+    """"
+    A class to take care of stem values (up, down, double, none)
+    """
+    def __init__ (self):
+        Event.__init__ (self)
+        self.value = None
+    def pre_note_ly (self):
+        if self.value:
+            return "\\%s" % self.value
+        elif self.value == "None" or self.value == "double":
+            return "\\stemNeutral"
+        else:
+            return None
+    def ly_expression (self):
+        return self.pre_note_ly ()
+
 class NotestyleEvent (Event):
     def __init__ (self):
         Event.__init__ (self)

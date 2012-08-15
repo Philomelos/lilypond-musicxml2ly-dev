@@ -1662,6 +1662,24 @@ def musicxml_notehead_to_lily (nh):
 
     return styles
 
+stem_value_dict = {
+    'down': 'stemDown',
+    'up': 'stemUp',
+    'double': None, # TODO: Implement
+    'none': 'stemNeutral', # TODO: Implement
+    }
+
+def musicxml_stemvalue_to_lily (sv):
+      values = []
+      value = stem_value_dict.get (sv.get_text (), None)
+      stem_value = musicexp.StemEvent ()
+      if value:
+            stem_value.value = value
+      if stem_value.value:
+            values.append (stem_value)
+      return values
+
+
 def musicxml_chordpitch_to_lily (mxl_cpitch):
     r = musicexp.ChordPitch ()
     r.alteration = mxl_cpitch.get_alteration ()
@@ -1884,6 +1902,12 @@ def musicxml_note_to_lily_main_event (n):
         styles = musicxml_notehead_to_lily (nh)
         for s in styles:
             event.add_associated_event (s)
+
+    stems = n.get_named_children ('stem')
+    for svs in stems:
+          values = musicxml_stemvalue_to_lily (svs)
+          for v in values:
+                event.add_associated_event (v)
 
     return event
 
