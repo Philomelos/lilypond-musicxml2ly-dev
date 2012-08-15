@@ -1908,7 +1908,6 @@ def musicxml_note_to_lily_main_event (n):
           values = musicxml_stemvalue_to_lily (svs)
           for v in values:
                 event.add_associated_event (v)
-
     return event
 
 def musicxml_lyrics_to_text (lyrics):

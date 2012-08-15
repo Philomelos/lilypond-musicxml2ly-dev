@@ -1313,15 +1313,18 @@ class StemEvent (Event):
     def __init__ (self):
         Event.__init__ (self)
         self.value = None
-    def pre_note_ly (self):
-        if self.value:
-            return "\\%s" % self.value
-        elif self.value == "None" or self.value == "double":
-            return "\\stemNeutral"
-        else:
-            return None
+    def pre_chord_ly (self):
+	if self.value:
+	    if self.value == "None" or self.value == "double":
+		return "\\stemNeutral"
+	    else:
+		return "\\%s" % self.value
+	else:
+	    return ''
+    def pre_note_ly (self, is_chord_element):
+	return ''
     def ly_expression (self):
-        return self.pre_note_ly ()
+        return self.pre_chord_ly ()
 
 class NotestyleEvent (Event):
     def __init__ (self):
