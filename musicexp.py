@@ -1929,11 +1929,14 @@ class StaffGroup:
             for [staff_id, voices] in self.part_information:
                 for [v, lyrics, figuredbass, chordnames] in voices:
                     if chordnames:
-                        printer ('\context ChordNames = "%s" \\%s' % (chordnames, chordnames))
+			if not get_transpose ():
+			    printer ('\context ChordNames = "%s" \\%s' % (chordnames, chordnames))
+			else:
+			    printer ('\context ChordNames = "%s" {\\transpose c %s \\%s}' % (chordnames, get_transpose (), chordnames))
                         printer.newline()
         except TypeError:
             return
-                    
+
     def print_ly (self, printer):
         printer.dump("<<\n")
         self.print_chords(printer)
@@ -1972,7 +1975,6 @@ class Staff (StaffGroup):
         pass
 
     def print_ly_contents (self, printer):
-        self.transpose = get_transpose ()
         if not self.id or not self.part_information:
             return
         sub_staff_type = self.substafftype
@@ -1999,10 +2001,10 @@ class Staff (StaffGroup):
                 if nr_voices > 1:
                     voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo',
                                         3: ' \\voiceThree'}.get (n, ' \\voiceFour')
-                if not self.transpose:
+                if not get_transpose ():
                     printer ('\\context %s = "%s" {%s \\%s }' % (self.voice_command, v, voice_count_text, v))
                 else:
-                    printer ('\\context %s = "%s" {\\transpose c %s %s \\%s }' % (self.voice_command, v, self.transpose, voice_count_text, v))
+                    printer ('\\context %s = "%s" {\\transpose c %s %s \\%s }' % (self.voice_command, v, get_transpose (), voice_count_text, v))
                 printer.newline ()
 
                 for l in lyrics:
