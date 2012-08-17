@@ -270,7 +270,7 @@ def get_tab_clef ():
     try:
         return tab_clef_option
     except:
-        return False
+        return "tab"
 
 # Implement the different note names for the various languages
 def pitch_generic (pitch, notenames, accidentals):
@@ -1687,36 +1687,20 @@ class ClefChange (Music):
         return {1: "^8", 2: "^15", -1: "_8", -2: "_15"}.get (self.octave, '')
     
     def clef_name (self):
-        if get_tab_clef () == "moderntab":
-            return {('G', 2): "treble",
-                    ('G', 1): "french",
-                    ('C', 1): "soprano",
-                    ('C', 2): "mezzosoprano",
-                    ('C', 3): "alto",
-                    ('C', 4): "tenor",
-                    ('C', 5): "baritone",
-                    ('F', 3): "varbaritone",
-                    ('F', 4): "bass",
-                    ('F', 5): "subbass",
-                    ("percussion", 2): "percussion",
-                # Workaround: MuseScore uses PERC instead of percussion
-                    ("PERC", 2): "percussion",
-                    ("TAB", 5): "moderntab"}.get ((self.type, self.position), None)
-        else:
-            return {('G', 2): "treble",
-                    ('G', 1): "french",
-                    ('C', 1): "soprano",
-                    ('C', 2): "mezzosoprano",
-                    ('C', 3): "alto",
-                    ('C', 4): "tenor",
-                    ('C', 5): "baritone",
-                    ('F', 3): "varbaritone",
-                    ('F', 4): "bass",
-                    ('F', 5): "subbass",
-                    ("percussion", 2): "percussion",
-                # Workaround: MuseScore uses PERC instead of percussion
-                    ("PERC", 2): "percussion",
-                    ("TAB", 5): "tab"}.get ((self.type, self.position), None)
+	return {('G', 2): "treble",
+		('G', 1): "french",
+		('C', 1): "soprano",
+		('C', 2): "mezzosoprano",
+		('C', 3): "alto",
+		('C', 4): "tenor",
+		('C', 5): "baritone",
+		('F', 3): "varbaritone",
+		('F', 4): "bass",
+		('F', 5): "subbass",
+		("percussion", 2): "percussion",
+	    # Workaround: MuseScore uses PERC instead of percussion
+		("PERC", 2): "percussion",
+		("TAB", 5): get_tab_clef ()}.get ((self.type, self.position), None)
             
     def ly_expression (self):
         return '\\clef "%s%s"' % (self.clef_name (), self.octave_modifier ())
