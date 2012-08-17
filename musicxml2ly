@@ -2784,6 +2784,13 @@ information.""") % 'lilypond')
                   dest="time_signature",
                   help=_ ("set the time signature to make the score look faster or slower, (eg. '4/4' or '6/8')"))
 
+    # switch tabstaff clef
+    p.add_option ('--tc', '--tab-clef',
+                  metavar=_ ("TABCLEFNAME"),
+                  action="store",
+                  dest="tab_clef",
+                  help=_ ("switch between two versions of tab clefs (\"tab\" and \"moderntab\")"))
+
     p.add_option_group ('',
                         description=(
             _ ("Report bugs via %s")
@@ -3075,6 +3082,10 @@ def main ():
     # transpose function
     if options.transpose:
         musicexp.set_transpose (options.transpose)
+
+    # tab clef option
+    if options.tab_clef:
+        musicexp.set_tab_clef (options.tab_clef)
 
     if options.language:
         musicexp.set_pitch_language (options.language)
