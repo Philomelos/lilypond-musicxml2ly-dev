@@ -3,6 +3,10 @@ lilypond-musicxml2ly-dev
 
 A fork of musicxml2ly for philomelos.net
 
+v0.1.12:
+* added the command line options --tc / --tabclef [tab|moderntab] to be able to switch between the two styles of the tab clef.
+* added support for ChordNames transposition
+
 v0.1.11:
 * implemented recognition of stem values "up" and "down"
 * removed temporary files (MusicXML-Testsuite)
@@ -10,7 +14,7 @@ v0.1.11:
 
 v0.1.10:
 * removed unused "copy" inclusion
-* fixed the ShiftDurations use in main script to wrap voices, chordmode anf figuremode
+* fixed the ShiftDurations use in main script to wrap voices, chordmode and figuremode
 
 v0.1.9:
 * fixed a documentation mistake in musicxml.py
