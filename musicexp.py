@@ -268,7 +268,7 @@ def set_tab_clef (option):
 
 def get_tab_clef ():
     try:
-        return tab_clef_option
+        return ("tab", tab_clef_option)[tab_clef_option == "tab" or tab_clef_option == "moderntab"]
     except:
         return "tab"
 
