@@ -234,11 +234,32 @@ def set_transpose (option):
     global transpose_option
     transpose_option = option
 
-def get_transpose ():
+def get_transpose (type):
     try:
-        return transpose_option
+	if(type == "string"):
+	    return transpose_option
+	elif(type == "integer"):
+	    tone_dict = {
+		"c" : 0,
+		"d" : 2,
+		"e" : 4,
+		"f" : 5,
+		"g" : 7,
+		"a" : 9,
+		"b" : 11
+	    }
+	    accidentals_dict = {
+		"" : 0,
+		"es" : -1,
+		"s" : -1,
+		"eses" : -2,
+		"ses" : -2,
+		"is" : 1,
+		"isis" : 2
+	    }
+	    return tone_dict.get(transpose_option[0], 0)+accidentals_dict.get(transpose_option[1:], 0)
     except:
-        return False
+        return 0
 
 # Implement the different note names for the various languages
 def pitch_generic (pitch, notenames, accidentals):
@@ -1268,11 +1289,11 @@ class FretEvent (MarkupEvent):
         if self.frets <> 4:
             val += "h:%s;" % self.frets
         if self.barre and len (self.barre) >= 3:
-            val += "c:%s-%s-%s;" % (self.barre[0], self.barre[1], self.barre[2])
+            val += "c:%s-%s-%s;" % (self.barre[0], self.barre[1], self.barre[2]+get_transpose("integer"))
         have_fingering = False
         for i in self.elements:
             if len (i) > 1:
-                val += "%s-%s" % (i[0], i[1])
+                val += "%s-%s" % (i[0], (i[1]+get_transpose("integer")))
             if len (i) > 2:
                 have_fingering = True
                 val += "-%s" % i[2]
@@ -1929,10 +1950,10 @@ class StaffGroup:
             for [staff_id, voices] in self.part_information:
                 for [v, lyrics, figuredbass, chordnames] in voices:
                     if chordnames:
-			if not get_transpose ():
+			if not get_transpose ("string"):
 			    printer ('\context ChordNames = "%s" \\%s' % (chordnames, chordnames))
 			else:
-			    printer ('\context ChordNames = "%s" {\\transpose c %s \\%s}' % (chordnames, get_transpose (), chordnames))
+			    printer ('\context ChordNames = "%s" {\\transpose c %s \\%s}' % (chordnames, get_transpose ("string"), chordnames))
                         printer.newline()
         except TypeError:
             return
@@ -2001,10 +2022,10 @@ class Staff (StaffGroup):
                 if nr_voices > 1:
                     voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo',
                                         3: ' \\voiceThree'}.get (n, ' \\voiceFour')
-                if not get_transpose ():
+                if not get_transpose ("string"):
                     printer ('\\context %s = "%s" {%s \\%s }' % (self.voice_command, v, voice_count_text, v))
                 else:
-                    printer ('\\context %s = "%s" {\\transpose c %s %s \\%s }' % (self.voice_command, v, get_transpose (), voice_count_text, v))
+                    printer ('\\context %s = "%s" {\\transpose c %s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
                 printer.newline ()
 
                 for l in lyrics:
