@@ -56,7 +56,7 @@ class Output_printer:
 
     def dump_version (self):
         self.newline ()
-        self.print_verbatim ('\\version "2.15.41"')
+        self.print_verbatim ('\\version "2.15.95"')
         self.newline ()
 
     def get_indent (self):
@@ -271,6 +271,17 @@ def get_tab_clef ():
         return ("tab", tab_clef_option)[tab_clef_option == "tab" or tab_clef_option == "moderntab"]
     except:
         return "tab"
+
+# definitions of the command line option '--string-numbers'
+def set_string_numbers (option):
+    global string_numbers_option
+    string_numbers_option = option
+
+def get_string_numbers ():
+    try:
+        return ("t", string_numbers_option)[string_numbers_option == "t" or string_numbers_option == "f"]
+    except:
+        return "t"
 
 # Implement the different note names for the various languages
 def pitch_generic (pitch, notenames, accidentals):
