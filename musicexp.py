@@ -234,11 +234,11 @@ def set_transpose (option):
     global transpose_option
     transpose_option = option
 
-def get_transpose (type):
+def get_transpose (optType):
     try:
-	if(type == "string"):
+	if(optType == "string"):
 	    return transpose_option
-	elif(type == "integer"):
+	elif(optType == "integer"):
 	    tone_dict = {
 		"c" : 0,
 		"d" : 2,
@@ -1303,8 +1303,9 @@ class FretEvent (MarkupEvent):
             val += "c:%s-%s-%s;" % (self.barre[0], self.barre[1], self.barre[2]+get_transpose("integer"))
         have_fingering = False
         for i in self.elements:
+	    print(i)
             if len (i) > 1:
-                val += "%s-%s" % (i[0], (i[1]+get_transpose("integer")))
+                val += "%s-%s" % (i[0], i[1]+(get_transpose("integer"),'')[isinstance(i[1],str)])
             if len (i) > 2:
                 have_fingering = True
                 val += "-%s" % i[2]
