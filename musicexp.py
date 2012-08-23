@@ -1314,7 +1314,6 @@ class FretEvent (MarkupEvent):
             val += "c:%s-%s-%s;" % (self.barre[0], self.barre[1], self.barre[2]+get_transpose("integer"))
         have_fingering = False
         for i in self.elements:
-	    print(i)
             if len (i) > 1:
                 val += "%s-%s" % (i[0], i[1]+(get_transpose("integer"),'')[isinstance(i[1],str)])
             if len (i) > 2:
