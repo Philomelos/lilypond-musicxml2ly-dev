@@ -1588,8 +1588,9 @@ def musicxml_frame_to_lily_event (frame):
     ev.strings = frame.get_strings ()
     ev.frets = frame.get_frets ()
     #offset = frame.get_first_fret () - 1
-#    offset = frame.get_first_fret ()
+    #offset = frame.get_first_fret ()
     barre = []
+    open_strings = range(1,ev.strings+1)
     for fn in frame.get_named_children ('frame-note'):
         fret = fn.get_fret ()
         if fret <= 0:
@@ -1599,12 +1600,17 @@ def musicxml_frame_to_lily_event (frame):
         if fingering >= 0:
             el.append (fingering)
         ev.elements.append (el)
+	open_strings.remove(fn.get_string())
         b = fn.get_barre ()
         if b == 'start':
             barre.append(el[0]) # start string
             barre.append(el[1]) # fret
         elif b == 'stop':
             barre.insert(1, el[0]) # end string
+    for string in open_strings:
+	ev.elements.append([string, 'x'])
+    ev.elements.sort()
+    ev.elements.reverse()
     if barre:
         ev.barre = barre
     return ev
