@@ -2672,7 +2672,7 @@ If the given filename is -, musicxml2ly reads from the command line.
                  action="help",
                  help=_ ("show this help and exit"))
 
-    p.version = ('''%prog (LilyPond) 2.15.41\n\n'''
+    p.version = ('''%prog (LilyPond) 2.15.95\n\n'''
 + 
 _ ("""Copyright (c) 2005--2011 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
@@ -2768,7 +2768,7 @@ information.""") % 'lilypond')
                   action="store_true",
                   default=False,
                   dest="midi",
-                  help=_("add midi-block to .ly file"))
+                  help=_("activate midi-block in .ly file"))
     
     # transpose function
     p.add_option ('--transpose',
@@ -2790,6 +2790,13 @@ information.""") % 'lilypond')
                   action="store",
                   dest="tab_clef",
                   help=_ ("switch between two versions of tab clefs (\"tab\" and \"moderntab\")"))
+
+    # StringNumber stencil on/off
+    p.add_option ('--sn', '--string-numbers',
+                  metavar=_ ("t[rue]/f[alse]"),
+                  action="store",
+                  dest="string_numbers",
+                  help=_ ("deactivate string number stencil with --string-numbers f[alse]. Default is t[rue]"))
 
     p.add_option_group ('',
                         description=(
@@ -2917,6 +2924,10 @@ def update_score_setup (score_structure, part_list, voices, parts):
 def update_layout_information ():
     if not conversion_settings.ignore_beaming and layout_information:
         layout_information.set_context_item ('Score', 'autoBeaming = ##f')
+    if musicexp.get_string_numbers() == "f":
+        layout_information.set_context_item ('Score', '\\override StringNumber #\'stencil = ##f')
+
+#  \n\t\t\t\t\\override StringNumber #\'stencil = ##f
 
 def print_ly_preamble (printer, filename):
     printer.dump_version ()
@@ -3086,6 +3097,10 @@ def main ():
     # tab clef option
     if options.tab_clef:
         musicexp.set_tab_clef (options.tab_clef)
+
+    # string numbers option
+    if options.string_numbers:
+        musicexp.set_string_numbers (options.string_numbers)
 
     if options.language:
         musicexp.set_pitch_language (options.language)
