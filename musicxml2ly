@@ -271,7 +271,6 @@ def musicxml_step_to_lily (step):
     else:
         return None
 
-
 def staff_attributes_to_string_tunings (mxl_attr):
     details = mxl_attr.get_maybe_exist_named_child ('staff-details')
     if not details:
@@ -305,11 +304,10 @@ def staff_attributes_to_string_tunings (mxl_attr):
             p.alteration = int (alter.get_text ().strip ())
     # lilypond seems to use the opposite ordering than MusicXML...
     tunings.reverse ()
-
     return tunings
 
-
 def staff_attributes_to_lily_staff (mxl_attr):
+    global string_tunings
     if not mxl_attr:
         return musicexp.Staff ()
 
@@ -342,6 +340,7 @@ def staff_attributes_to_lily_staff (mxl_attr):
     elif clef_sign == "tab":
         staff = musicexp.TabStaff ()
         staff.string_tunings = staff_attributes_to_string_tunings (attributes)
+        string_tunings = staff.string_tunings
         # staff.tablature_format = ???
     else:
         staff = musicexp.Staff ()
@@ -1583,47 +1582,6 @@ def musicxml_direction_to_lily (n):
 
     return res
 
-def musicxml_frame_to_lily_event (frame):
-    ev = musicexp.FretEvent ()
-    ev.strings = frame.get_strings ()
-    ev.frets = frame.get_frets ()
-    #offset = frame.get_first_fret () - 1
-    #offset = frame.get_first_fret ()
-    barre = []
-    open_strings = range(1,ev.strings+1)
-    for fn in frame.get_named_children ('frame-note'):
-        fret = fn.get_fret ()
-        if fret <= 0:
-            fret = "o"
-        el = [ fn.get_string (), fret ]
-        fingering = fn.get_fingering ()
-        if fingering >= 0:
-            el.append (fingering)
-        ev.elements.append (el)
-	open_strings.remove(fn.get_string())
-        b = fn.get_barre ()
-        if b == 'start':
-            barre.append(el[0]) # start string
-            barre.append(el[1]) # fret
-        elif b == 'stop':
-            barre.insert(1, el[0]) # end string
-    for string in open_strings:
-	ev.elements.append([string, 'x'])
-    ev.elements.sort()
-    ev.elements.reverse()
-    if barre:
-        ev.barre = barre
-    return ev
-
-def musicxml_harmony_to_lily (n):
-    res = []
-    for f in n.get_named_children ('frame'):
-        ev = musicxml_frame_to_lily_event (f)
-        if ev:
-            res.append (ev)
-    return res
-
-
 notehead_styles_dict = {
     'slash': '\'slash',
     'triangle': '\'triangle',
@@ -1745,6 +1703,91 @@ def musicxml_chordkind_to_lily (kind):
         ly.warning (_ ("Unable to convert chord type %s to lilypond.") % kind)
     return res
 
+
+# Global variable for guitar string tunings
+string_tunings = None
+
+def musicxml_get_string_tunings (lines):
+    global string_tunings
+    if (string_tunings == None):
+	if not lines:
+	    lines = 6
+	string_tunings = [musicexp.Pitch()] * lines
+	for i in range(0, lines):
+	    p = musicexp.Pitch()
+	    p.step = musicxml_step_to_lily (((("E","A","D","G","B")*(lines/5+1))[0:lines])[i])
+	    p.octave = (([-2+int(x%5>1)+2*(x/5) for x in range(0,lines)][0:lines])[i])
+	    p.alteration = 0
+	    p._force_absolute_pitch = True
+	    string_tunings[i] = p
+	string_tunings = string_tunings[::-1]
+    return string_tunings[0:lines]
+
+def musicxml_frame_to_lily_event (frame):
+    ev = musicexp.FretEvent ()
+    ev.strings = frame.get_strings ()
+    ev.frets = frame.get_frets ()
+    #offset = frame.get_first_fret () - 1
+    #offset = frame.get_first_fret ()
+    barre = []
+    open_strings = range(1,ev.strings+1)
+    for fn in frame.get_named_children ('frame-note'):
+        fret = fn.get_fret ()
+        if fret <= 0:
+            fret = "o"
+        el = [ fn.get_string (), fret ]
+        fingering = fn.get_fingering ()
+        if fingering >= 0:
+            el.append (fingering)
+        ev.elements.append (el)
+	open_strings.remove(fn.get_string())
+        b = fn.get_barre ()
+        if b == 'start':
+            barre.append(el[0]) # start string
+            barre.append(el[1]) # fret
+        elif b == 'stop':
+            barre.insert(1, el[0]) # end string
+    for string in open_strings:
+	ev.elements.append([string, 'x'])
+    ev.elements.sort()
+    ev.elements.reverse()
+    if barre:
+        ev.barre = barre
+    return ev
+
+def musicxml_harmony_to_lily (n):
+    res = []
+    for f in n.get_named_children ('frame'):
+        ev = musicxml_frame_to_lily_event (f)
+        if ev:
+            res.append (ev)
+    return res
+
+def musicxml_harmony_to_lily_fretboards (n):
+    res = []
+    frame = n.get_maybe_exist_named_child('frame')
+    if frame:
+	#ev.frets = frame.get_frets ()
+	strings = frame.get_strings ()
+	if not strings:
+	    strings = 6
+	tunings = musicxml_get_string_tunings(strings)
+	ev = musicexp.FretBoardEvent ()
+	#barre = []
+	for fn in frame.get_named_children ('frame-note'):
+	    fbn = musicexp.FretBoardNote()
+	    string = fn.get_string ()
+	    fbn.string = string
+	    fingering = fn.get_fingering ()
+	    if fingering >= 0:
+		fbn.fingering = fingering
+	    p = tunings[string-1].copy()
+	    p.add_semitones (fn.get_fret ())
+	    fbn.pitch = p
+	    ev.append(fbn)
+	res.append (ev)
+    return res
+
 def musicxml_harmony_to_lily_chordname (n):
     res = []
     root = n.get_maybe_exist_named_child ('root')
@@ -1790,7 +1833,6 @@ def musicxml_harmony_to_lily_chordname (n):
             #half-diminished: (o with slash), like Unicode 00F8
         if ev and ev.root:
             res.append (ev)
-
     return res
 
 def musicxml_figured_bass_note_to_lily (n):
@@ -2084,7 +2126,6 @@ class LilyPondVoiceBuilder:
             self.ignore_skips = False
 
     def last_event_chord (self, starting_at):
-
         value = None
 
         # if the position matches, find the last ChordEvent, do not cross a bar line!
@@ -2117,6 +2158,7 @@ class VoiceData:
         self.ly_voice = None
         self.figured_bass = None
         self.chordnames = None
+        self.fretboards = None
         self.lyrics_dict = {}
         self.lyrics_order = []
 
@@ -2147,6 +2189,7 @@ def musicxml_voice_to_lily_voice (voice):
 
     pending_figured_bass = []
     pending_chordnames = []
+    pending_fretboards = []
 
     # Make sure that the keys in the dict don't get reordered, since
     # we need the correct ordering of the lyrics stanzas! By default,
@@ -2158,6 +2201,7 @@ def musicxml_voice_to_lily_voice (voice):
     voice_builder = LilyPondVoiceBuilder ()
     figured_bass_builder = LilyPondVoiceBuilder ()
     chordnames_builder = LilyPondVoiceBuilder ()
+    fretboards_builder = LilyPondVoiceBuilder ()
     current_measure_length = Rational (4, 4)
     voice_builder.set_measure_length (current_measure_length)
 
@@ -2178,6 +2222,7 @@ def musicxml_voice_to_lily_voice (voice):
                 voice_builder.add_partial (a)
                 figured_bass_builder.add_partial (a)
                 chordnames_builder.add_partial (a)
+                fretboards_builder.add_partial (a)
             continue
 
         is_chord = n.get_maybe_exist_named_child ('chord')
@@ -2187,10 +2232,12 @@ def musicxml_voice_to_lily_voice (voice):
                 voice_builder.jumpto (n._when)
                 figured_bass_builder.jumpto (n._when)
                 chordnames_builder.jumpto (n._when)
+                fretboards_builder.jumpto (n._when)
             except NegativeSkip, neg:
                 voice_builder.correct_negative_skip (n._when)
                 figured_bass_builder.correct_negative_skip (n._when)
                 chordnames_builder.correct_negative_skip (n._when)
+		fretboards_builder.correct_negative_skip (n._when)
                 n.message (_ ("Negative skip found: from %s to %s, difference is %s") % (neg.here, neg.dest, neg.dest - neg.here))
 
         if isinstance (n, musicxml.Barline):
@@ -2200,10 +2247,12 @@ def musicxml_voice_to_lily_voice (voice):
                     voice_builder.add_barline (a)
                     figured_bass_builder.add_barline (a, False)
                     chordnames_builder.add_barline (a, False)
+                    fretboards_builder.add_barline (a, False)
                 elif isinstance (a, RepeatMarker) or isinstance (a, EndingMarker):
                     voice_builder.add_command (a)
                     figured_bass_builder.add_barline (a, False)
                     chordnames_builder.add_barline (a, False)
+                    fretboards_builder.add_barline (a, False)
             continue
 
 
@@ -2231,6 +2280,7 @@ def musicxml_voice_to_lily_voice (voice):
                 voice_builder.add_bar_check (num)
                 figured_bass_builder.add_bar_check (num)
                 chordnames_builder.add_bar_check (num)
+                fretboards_builder.add_bar_check (num)
 
         # Start any new multimeasure rests
         if (rest and rest.is_whole_measure ()):
@@ -2247,12 +2297,18 @@ def musicxml_voice_to_lily_voice (voice):
             continue
 
         if isinstance (n, musicxml.Harmony):
-            for a in musicxml_harmony_to_lily (n):
-                if a.wait_for_note ():
-                    voice_builder.add_dynamics (a)
-                else:
-                    voice_builder.add_command (a)
-            for a in musicxml_harmony_to_lily_chordname (n):
+	    if (options.fretboards):
+		# Makes fretboard diagrams in a separate FretBoards voice
+		for a in musicxml_harmony_to_lily_fretboards (n):
+		    pending_fretboards.append (a)
+	    else:
+		# Makes markup fretboard-diagrams inside the voice
+		for a in musicxml_harmony_to_lily (n):
+		    if a.wait_for_note ():
+			voice_builder.add_dynamics (a)
+		    else:
+			voice_builder.add_command (a)
+	    for a in musicxml_harmony_to_lily_chordname (n):
                 pending_chordnames.append (a)
             continue
 
@@ -2357,6 +2413,17 @@ def musicxml_voice_to_lily_voice (voice):
                 cn.duration = ev_chord.get_duration ()
                 chordnames_builder.add_music (cn, ev_chord.get_length ())
             pending_chordnames = []
+
+	if pending_fretboards:
+            try:
+                fretboards_builder.jumpto (n._when)
+            except NegativeSkip, neg:
+                pass
+            for fb in pending_fretboards:
+                # Assign the duration of the EventChord
+                fb.duration = ev_chord.get_duration ()
+                fretboards_builder.add_music (fb, ev_chord.get_length ())
+            pending_fretboards = []
 
         notations_children = n.get_typed_children (musicxml.Notations)
         tuplet_event = None
@@ -2513,7 +2580,7 @@ def musicxml_voice_to_lily_voice (voice):
 	for event in voice_builder.elements:
 	    if isinstance(event, musicexp.TimeSignatureChange):
 		sd = []
-		for i in range(0,3):
+		for i in range(0,5):
 		    sd.append(musicexp.ShiftDurations ())
 		    sd[i].set_shift_durations_parameters (event)
 		break;
@@ -2582,6 +2649,17 @@ def musicxml_voice_to_lily_voice (voice):
 	    sd.pop()
         return_value.chordnames = v
 
+    # create diagrams for FretBoards engraver
+    if fretboards_builder.has_relevant_elements:
+        fboard_music = musicexp.SequentialMusic ()
+        fboard_music.elements = group_repeats (fretboards_builder.elements)
+        v = musicexp.MusicWrapper()
+        v.element = fboard_music
+	if options.time_signature:
+	    sd[-1].element = v
+	    v = sd[-1]
+	    sd.pop()
+        return_value.fretboards = v
     return return_value
 
 def musicxml_id_to_lily (id):
@@ -2635,8 +2713,8 @@ def voices_in_part (part):
 
 def voices_in_part_in_parts (parts):
     """return a Part -> Name -> Voice dictionary"""
-    # don't crash if p doesn't have an id (that's invalid MusicXML,
-    # but such files are out in the wild!
+    # don't crash if Part doesn't have an id (that's invalid MusicXML,
+    # but such files are out in the wild!)
     dictionary = {}
     for p in parts:
         voices = voices_in_part (p)
@@ -2804,6 +2882,13 @@ information.""") % 'lilypond')
                   dest="string_numbers",
                   help=_ ("deactivate string number stencil with --string-numbers f[alse]. Default is t[rue]"))
 
+    # StringNumber stencil on/off
+    p.add_option ('--fb', '--fretboards',
+                  action="store_true",
+                  default=False,
+                  dest="fretboards",
+                  help=_("converts '<frame>' events to a separate FretBoards voice instead of markups"))
+
     p.add_option_group ('',
                         description=(
             _ ("Report bugs via %s")
@@ -2816,15 +2901,19 @@ def music_xml_voice_name_to_lily_name (part_id, name):
     return musicxml_id_to_lily (str)
 
 def music_xml_lyrics_name_to_lily_name (part_id, name, lyricsnr):
-    str = "Part%sVoice%sLyrics%s" % (part_id, name, lyricsnr)
+    str = music_xml_voice_name_to_lily_name (part_id, name)+("Lyrics%s" % lyricsnr)
     return musicxml_id_to_lily (str)
 
 def music_xml_figuredbass_name_to_lily_name (part_id, voicename):
-    str = "Part%sVoice%sFiguredBass" % (part_id, voicename)
+    str = music_xml_voice_name_to_lily_name (part_id, voicename)+"FiguredBass"
     return musicxml_id_to_lily (str)
 
 def music_xml_chordnames_name_to_lily_name (part_id, voicename):
-    str = "Part%sVoice%sChords" % (part_id, voicename)
+    str = music_xml_voice_name_to_lily_name (part_id, voicename)+"Chords"
+    return musicxml_id_to_lily (str)
+
+def music_xml_fretboards_name_to_lily_name (part_id, voicename):
+    str = music_xml_voice_name_to_lily_name (part_id, voicename)+"FretBoards"
     return musicxml_id_to_lily (str)
 
 def print_voice_definitions (printer, part_list, voices):
@@ -2851,7 +2940,11 @@ def print_voice_definitions (printer, part_list, voices):
                 printer.dump ('%s = ' % fbname)
                 voice.figured_bass.print_ly (printer)
                 printer.newline()
-
+            if voice.fretboards:
+                fbdname = music_xml_fretboards_name_to_lily_name (part_id, name)
+                printer.dump ('%s = ' % fbdname)
+                voice.fretboards.print_ly (printer)
+                printer.newline()
 
 def uniq_list (l):
     return dict ([(elt, 1) for elt in l]).keys ()
@@ -2867,7 +2960,7 @@ def uniq_list (l):
 # raw_voices is of the form [(voicename, lyricsids, havefiguredbass)*]
 def format_staff_info (part_id, staff_id, raw_voices):
     voices = []
-    for (v, lyricsids, figured_bass, chordnames) in raw_voices:
+    for (v, lyricsids, figured_bass, chordnames, fretboards) in raw_voices:
         voice_name = music_xml_voice_name_to_lily_name (part_id, v)
         voice_lyrics = [music_xml_lyrics_name_to_lily_name (part_id, v, l)
                    for l in lyricsids]
@@ -2877,7 +2970,10 @@ def format_staff_info (part_id, staff_id, raw_voices):
         chordnames_name = ''
         if chordnames:
             chordnames_name = music_xml_chordnames_name_to_lily_name (part_id, v)
-        voices.append ([voice_name, voice_lyrics, figured_bass_name, chordnames_name])
+        fretboards_name = ''
+        if fretboards:
+            fretboards_name = music_xml_fretboards_name_to_lily_name (part_id, v)
+        voices.append ([voice_name, voice_lyrics, figured_bass_name, chordnames_name, fretboards_name])
     return [staff_id, voices]
 
 def update_score_setup (score_structure, part_list, voices, parts):
@@ -2899,12 +2995,12 @@ def update_score_setup (score_structure, part_list, voices, parts):
             staves = uniq_list (staves)
             staves.sort ()
             for s in staves:
-                thisstaff_raw_voices = [(voice_name, voice.lyrics_order, voice.figured_bass, voice.chordnames)
+                thisstaff_raw_voices = [(voice_name, voice.lyrics_order, voice.figured_bass, voice.chordnames, voice.fretboards)
                     for (voice_name, voice) in nv_dict.items ()
                     if voice.voicedata._start_staff == s]
                 staves_info.append (format_staff_info (part_id, s, thisstaff_raw_voices))
         else:
-            thisstaff_raw_voices = [(voice_name, voice.lyrics_order, voice.figured_bass, voice.chordnames)
+            thisstaff_raw_voices = [(voice_name, voice.lyrics_order, voice.figured_bass, voice.chordnames, voice.fretboards)
                 for (voice_name, voice) in nv_dict.items ()]
             staves_info.append (format_staff_info (part_id, None, thisstaff_raw_voices))
         score_structure.set_part_information (part_id, staves_info)

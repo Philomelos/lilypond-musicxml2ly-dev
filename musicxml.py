@@ -480,7 +480,7 @@ class Note (Measure_element):
             return 3
         else:
             return None
-    
+
     def get_duration_info (self):
         log = self.get_duration_log ()
         if log != None:
@@ -499,7 +499,7 @@ class Part_list (Music_xml_node):
     def __init__ (self):
         Music_xml_node.__init__ (self)
         self._id_instrument_name_dict = {}
-        
+
     def generate_id_instrument_dict (self):
 
         ## not empty to make sure this happens only once.
@@ -527,7 +527,7 @@ class Part_group (Music_xml_node):
     pass
 class Score_part (Music_xml_node):
     pass
-        
+
 class Measure (Music_xml_node):
     def __init__ (self):
         Music_xml_node.__init__ (self)
@@ -632,13 +632,13 @@ class Part (Music_xml_node):
             n = n._parent
 
         return n.get_named_child ('part-list')
-       
+
     def interpret (self):
         """Set durations and starting points."""
         """The starting point of the very first note is 0!"""
-        
+
         part_list = self.get_part_list ()
-        
+
         now = Rational (0)
         factor = Rational (1)
         attributes_dict = {}
@@ -695,15 +695,15 @@ class Part (Music_xml_node):
                     n.read_self ()
                     attributes_dict = n._dict.copy ()
                     attributes_object = n
-                    
+
                     factor = Rational (1,
                                        int (attributes_dict.get ('divisions').get_text ()))
 
-                
+
                 if (n.get_maybe_exist_typed_child (Duration)):
                     mxl_dur = n.get_maybe_exist_typed_child (Duration)
                     dur = mxl_dur.get_length () * factor
-                    
+
                     if n.get_name() == 'backup':
                         dur = -dur
                         # reset all graces before the backup to after-graces:
@@ -1270,7 +1270,7 @@ def get_class (name):
         klass = new.classobj (class_name, (Music_xml_node,) , {})
         class_dict[name] = klass
         return klass
-        
+
 def lxml_demarshal_node (node):
     name = node.tag
 
@@ -1279,13 +1279,13 @@ def lxml_demarshal_node (node):
         return None
     klass = get_class (name)
     py_node = klass()
-    
+
     py_node._original = node
     py_node._name = name
     py_node._data = node.text
     py_node._children = [lxml_demarshal_node (cn) for cn in node.getchildren()]
     py_node._children = filter (lambda x: x, py_node._children)
-    
+
     for c in py_node._children:
         c._parent = py_node
 

@@ -237,29 +237,15 @@ def set_transpose (option):
 def get_transpose (optType):
     try:
 	if(optType == "string"):
-	    return transpose_option
+	    return '\\transpose c %s' % transpose_option
 	elif(optType == "integer"):
-	    tone_dict = {
-		"c" : 0,
-		"d" : 2,
-		"e" : 4,
-		"f" : 5,
-		"g" : 7,
-		"a" : 9,
-		"b" : 11
-	    }
-	    accidentals_dict = {
-		"" : 0,
-		"es" : -1,
-		"s" : -1,
-		"eses" : -2,
-		"ses" : -2,
-		"is" : 1,
-		"isis" : 2
-	    }
-	    return tone_dict.get(transpose_option[0], 0)+accidentals_dict.get(transpose_option[1:], 0)
+	    p = generic_tone_to_pitch(transpose_option)
+	    return p.semitones ()
     except:
-        return 0
+        if(optType == "string"):
+	    return ""
+	elif(optType == "integer"):
+	    return 0
 
 # implement the command line option '--tab-clef'
 def set_tab_clef (option):
@@ -282,6 +268,24 @@ def get_string_numbers ():
         return ("t", string_numbers_option)[string_numbers_option == "t" or string_numbers_option == "f"]
     except:
         return "t"
+
+def generic_tone_to_pitch (tone):
+    accidentals_dict = {
+	"" : 0,
+	"es" : -1,
+	"s" : -1,
+	"eses" : -2,
+	"ses" : -2,
+	"is" : 1,
+	"isis" : 2
+    }
+    p = Pitch ()
+    tone_ = tone.strip().lower()
+    p.octave = tone_.count("'") - tone_.count(",")
+    tone_ = tone_.replace(",","").replace("'","")
+    p.step = ((ord (tone_[0]) - ord ('a') + 5) % 7)
+    p.alteration = accidentals_dict.get(tone_[1:], 0)
+    return p
 
 # Implement the different note names for the various languages
 def pitch_generic (pitch, notenames, accidentals):
@@ -356,7 +360,6 @@ def set_pitch_language (language):
 # global variable to hold the formatting function.
 pitch_generating_function = pitch_general
 
-
 class Pitch:
     def __init__ (self):
         self.alteration = 0
@@ -395,6 +398,7 @@ class Pitch:
         p.alteration = self.alteration
         p.step = self.step
         p.octave = self.octave
+        p._force_absolute_pitch = self._force_absolute_pitch
         return p
 
     def steps (self):
@@ -403,6 +407,28 @@ class Pitch:
     def semitones (self):
         return self.octave * 12 + [0, 2, 4, 5, 7, 9, 11][self.step] + self.alteration
 
+    def normalize_alteration (c):
+	if(c.alteration < 0 and [True, False, False, True, False, False, False][c.step]):
+	    c.alteration += 1
+	    c.step -= 1
+	elif(c.alteration > 0 and [False, False, True, False, False, False, True][c.step]):
+	    c.alteration -= 1
+	    c.step += 1
+	c.normalize ()
+
+    def add_semitones (self, number):
+	semi = number + self.alteration
+	self.alteration = 0
+	if(semi == 0):
+	    return
+	sign = (1,-1)[semi < 0]
+	prev = self.semitones()
+	while abs((prev + semi) - self.semitones ()) > 1:
+	    self.step += sign
+	    self.normalize()
+	self.alteration += (prev + semi) - self.semitones ()
+	self.normalize_alteration ()
+	
     def ly_step_expression (self):
         return pitch_generating_function (self)
 
@@ -436,7 +462,6 @@ class Pitch:
             str += self.relative_pitch ()
         else:
             str += self.absolute_pitch ()
-
         return str
 
     def print_ly (self, outputter):
@@ -1327,6 +1352,32 @@ class FretEvent (MarkupEvent):
         else:
             return ''
 
+class FretBoardNote (Music):
+    def __init__ (self):
+	Music.__init__ (self)
+	self.pitch = None
+	self.string = None
+	self.fingering = None
+    def ly_expression (self):
+	str = self.pitch.ly_expression()
+	if self.fingering:
+	    str += "-%s" % self.fingering
+	if self.string:
+	    str += "\%s" % self.string
+        return str
+
+class FretBoardEvent (NestedMusic):
+    def __init__ (self):
+        NestedMusic.__init__ (self)
+        self.duration = None
+    def print_ly (self, printer):
+        fretboard_notes = [n for n in self.elements if isinstance (n, FretBoardNote)]
+        if fretboard_notes:
+          notes = []
+          for n in fretboard_notes:
+              notes.append (n.ly_expression ())
+          contents = string.join (notes)
+          printer ('<%s>%s' % (contents,self.duration))
 
 class FunctionWrapperEvent (Event):
     def __init__ (self, function_name=None):
@@ -1634,6 +1685,18 @@ class KeySignatureChange (Music):
         else:
             return ''
 
+class ShiftDurations (MusicWrapper):
+    def __init__ (self):
+        MusicWrapper.__init__ (self)
+	self.params = [0,0]
+
+    def set_shift_durations_parameters(self, timeSigChange):
+	self.params = timeSigChange.get_shift_durations_parameters()
+
+    def print_ly (self, func):
+        func (' \\shiftDurations #%d #%d ' % tuple(self.params))
+        MusicWrapper.print_ly (self, func)
+        
 class TimeSignatureChange (Music):
     def __init__ (self):
         Music.__init__ (self)
@@ -1942,6 +2005,7 @@ class StaffGroup:
         for c in self.children:
             if c:
                 c.print_ly (printer)
+
     def needs_with (self):
         needs_with = False
         needs_with |= self.spanbar == "no"
@@ -1972,19 +2036,28 @@ class StaffGroup:
     def print_chords(self, printer):
         try:
             for [staff_id, voices] in self.part_information:
-                for [v, lyrics, figuredbass, chordnames] in voices:
+                for [v, lyrics, figuredbass, chordnames, fretboards] in voices:
                     if chordnames:
-			if not get_transpose ("string"):
-			    printer ('\context ChordNames = "%s" \\%s' % (chordnames, chordnames))
-			else:
-			    printer ('\context ChordNames = "%s" {\\transpose c %s \\%s}' % (chordnames, get_transpose ("string"), chordnames))
+			printer ('\context ChordNames = "%s" {%s \\%s}' % (chordnames, get_transpose ("string"), chordnames))
                         printer.newline()
         except TypeError:
             return
 
+    def print_fretboards(self, printer):
+        try:
+            for [staff_id, voices] in self.part_information:
+                for [v, lyrics, figuredbass, chordnames, fretboards] in voices:
+                    if fretboards:
+			printer ('\context FretBoards = "%s" {%s \\%s}' % (fretboards, get_transpose ("string"), fretboards))
+                        printer.newline()
+        except TypeError:
+            return
+
+
     def print_ly (self, printer):
         printer.dump("<<\n")
         self.print_chords(printer)
+        self.print_fretboards(printer)
         if self.stafftype:
             printer.dump ("\\new %s" % self.stafftype)
         self.print_ly_overrides (printer)
@@ -2001,9 +2074,7 @@ class StaffGroup:
         self.print_ly_contents (printer)
         printer.newline ()
         printer.dump (">>")
-#        printer.newline ()
         printer.dump (">>")
-#        printer.newline ()
 
 
 class Staff (StaffGroup):
@@ -2016,6 +2087,7 @@ class Staff (StaffGroup):
 
     def needs_with (self):
         return False
+
     def print_ly_context_mods (self, printer):
         pass
 
@@ -2027,11 +2099,6 @@ class Staff (StaffGroup):
             sub_staff_type = self.stafftype
 
         for [staff_id, voices] in self.part_information:
-#            # Chord names need to come before the staff itself!
-#            for [v, lyrics, figuredbass, chordnames] in voices:
-#                if chordnames:
-#                    printer ('\context ChordNames = "%s" \\%s' % (chordnames, chordnames))
-
             # now comes the real staff definition:
             if staff_id:
                 printer ('\\context %s = "%s" << ' % (sub_staff_type, staff_id))
@@ -2040,18 +2107,13 @@ class Staff (StaffGroup):
             printer.newline ()
             n = 0
             nr_voices = len (voices)
-            for [v, lyrics, figuredbass, chordnames] in voices:
+            for [v, lyrics, figuredbass, chordnames, fretboards] in voices:
                 n += 1
                 voice_count_text = ''
                 if nr_voices > 1:
-                    voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo',
-                                        3: ' \\voiceThree'}.get (n, ' \\voiceFour')
-                if not get_transpose ("string"):
-                    printer ('\\context %s = "%s" {%s \\%s }' % (self.voice_command, v, voice_count_text, v))
-                else:
-                    printer ('\\context %s = "%s" {\\transpose c %s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
+                    voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo', 3: ' \\voiceThree'}.get (n, ' \\voiceFour')
+                printer ('\\context %s = "%s" {%s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
                 printer.newline ()
-
                 for l in lyrics:
                     printer ('\\new Lyrics \\lyricsto "%s" \\%s' % (v, l))
                     printer.newline()
@@ -2147,18 +2209,6 @@ class Score:
         printer.newline ()
         printer.dump ("}")
         printer.newline ()
-
-class ShiftDurations (MusicWrapper):
-    def __init__ (self):
-        MusicWrapper.__init__ (self)
-	self.params = [0,0]
-
-    def set_shift_durations_parameters(self, timeSigChange):
-	self.params = timeSigChange.get_shift_durations_parameters()
-
-    def print_ly (self, func):
-        func (' \\shiftDurations #%d #%d ' % tuple(self.params))
-        MusicWrapper.print_ly (self, func)
 
 def test_pitch ():
     bflat = Pitch()
