@@ -279,7 +279,6 @@ def staff_attributes_to_string_tunings (mxl_attr):
     staff_lines = details.get_maybe_exist_named_child ('staff-lines')
     if staff_lines:
         lines = string.atoi (staff_lines.get_text ())
-
     tunings = [musicexp.Pitch()] * lines
     staff_tunings = details.get_named_children ('staff-tuning')
     for i in staff_tunings:
@@ -307,7 +306,6 @@ def staff_attributes_to_string_tunings (mxl_attr):
     return tunings
 
 def staff_attributes_to_lily_staff (mxl_attr):
-    global string_tunings
     if not mxl_attr:
         return musicexp.Staff ()
 
@@ -340,7 +338,6 @@ def staff_attributes_to_lily_staff (mxl_attr):
     elif clef_sign == "tab":
         staff = musicexp.TabStaff ()
         staff.string_tunings = staff_attributes_to_string_tunings (attributes)
-        string_tunings = staff.string_tunings
         # staff.tablature_format = ???
     else:
         staff = musicexp.Staff ()
@@ -348,9 +345,7 @@ def staff_attributes_to_lily_staff (mxl_attr):
         if (lines != 5):
             staff.add_context_modification ("\\override StaffSymbol #'line-count = #%s" % lines)
 
-
     return staff
-
 
 def extract_score_structure (part_list, staffinfo):
     score = musicexp.Score ()
@@ -1767,7 +1762,6 @@ def musicxml_harmony_to_lily_fretboards (n):
     res = []
     frame = n.get_maybe_exist_named_child('frame')
     if frame:
-	#ev.frets = frame.get_frets ()
 	strings = frame.get_strings ()
 	if not strings:
 	    strings = 6
