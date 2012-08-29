@@ -750,9 +750,9 @@ def musicxml_clef_to_lily (attributes):
 def musicxml_time_to_lily (attributes):
     change = musicexp.TimeSignatureChange()
     # time signature function
-    if options.time_signature:
-	tmp_sig = options.time_signature.split("/",1)
-	sig = [int(tmp_sig[0]), int(tmp_sig[1])]
+    if options.shift_meter:
+	tmp_meter = options.shift_meter.split("/",1)
+	sig = [int(tmp_meter[0]), int(tmp_meter[1])]
 	change.originalFractions = attributes.get_time_signature ()
     else:
 	sig = attributes.get_time_signature ()
@@ -773,7 +773,6 @@ def musicxml_time_to_lily (attributes):
     # TODO: Handle hidden time signatures (print-object="no")
     # TODO: What shall we do if the symbol clashes with the sig? e.g. "cut"
     #       with 3/8 or "single-number" with (2+3)/8 or 3/8+2/4?
-
     return change
 
 def musicxml_key_to_lily (attributes):
@@ -2570,7 +2569,7 @@ def musicxml_voice_to_lily_voice (voice):
 
     ## force trailing mm rests to be written out.
     voice_builder.add_music (musicexp.ChordEvent (), Rational (0))
-    if options.time_signature:
+    if options.shift_meter:
 	for event in voice_builder.elements:
 	    if isinstance(event, musicexp.TimeSignatureChange):
 		sd = []
@@ -2599,7 +2598,7 @@ def musicxml_voice_to_lily_voice (voice):
        ly.warning (_ ('cannot simultaneously have more than one mode: %s') % modes_found.keys ())
 
 
-    if options.time_signature:
+    if options.shift_meter:
         sd[-1].element = seq_music
         seq_music = sd[-1]
         sd.pop()
@@ -2624,7 +2623,7 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'figuremode'
         v.element = fbass_music
-	if options.time_signature:
+	if options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -2637,7 +2636,7 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'chordmode'
         v.element = cname_music
-	if options.time_signature:
+	if options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -2649,7 +2648,7 @@ def musicxml_voice_to_lily_voice (voice):
         fboard_music.elements = group_repeats (fretboards_builder.elements)
         v = musicexp.MusicWrapper()
         v.element = fboard_music
-	if options.time_signature:
+	if options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -2856,11 +2855,11 @@ information.""") % 'lilypond')
                   help=_ ("set pitch to transpose by the interval between pitch 'c' and TOPITCH"))
 
     # time signature changing function
-    p.add_option ('--ts', '--time-signature',
+    p.add_option ('--sm', '--shift-meter',
                   metavar=_ ("BEATS/BEATTYPE"),
                   action="store",
-                  dest="time_signature",
-                  help=_ ("set the time signature to make the score look faster or slower, (eg. '4/4' or '6/8')"))
+                  dest="shift_meter",
+                  help=_ ("change the length|duration of notes as a function of a given time signature to make the score look faster or slower, (eg. '4/4' or '2/2')"))
 
     # switch tabstaff clef
     p.add_option ('--tc', '--tab-clef',
