@@ -1,0 +1,40 @@
+
+\version "2.17.3"
+% automatically converted by musicxml2ly from time-modification_and_chorded_notes.xml
+
+\header {
+    texidoc = "Sibelius 7.0.0 exports wrong duration values
+                for chorded notes in tuplets. The exported value here is 256 instead of 170. 
+                170 is not an optimal value for a quarter note in a triplet of eighths as there 
+                is a rounding difference (256*2/3=170.6666...). musicxml2ly seems to cut off the 
+                decimal places and the result looks OK but"
+    title = "wrong durations in chorded notes with time-modifications"
+    }
+
+\layout {
+    \context { \Score
+        autoBeaming = ##f
+        }
+    }
+PartPOneVoiceOne =  {
+    \clef "treble" \key c \major \numericTimeSignature\time 4/4 \times
+    2/3 {
+        <c'' a'>4*255/256 s512*43 r8*129/128 }
+    r4 r2 }
+
+
+% The score definition
+\score {
+    <<
+        \new Staff <<
+            \context Staff << 
+                \context Voice = "PartPOneVoiceOne" { \PartPOneVoiceOne }
+                >>
+            >>
+        
+        >>
+    \layout {}
+    % To create MIDI output, uncomment the following line:
+    %  \midi {}
+    }
+

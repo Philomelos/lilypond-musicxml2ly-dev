@@ -2,25 +2,12 @@
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
+  <work>
+    <work-title>musicxml2ly swallows syllables</work-title>
+  </work>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Soll eine Silbe unter einer Note stehen, an der ein 
-    Legatobogen endet bzw. die manuell mit der davor stehenden Note 
-    verbalkt wurde, dann kann dies über zwei Lösungsansätze erreicht 
-    werden:
-    1. In der .ly-Datei muss in der entsprechenden Notenvariable direkt 
-    vor der Note mit Liedtext, an der der Legatobogen beginnt, der Befehl 
-    \set melismaBusyProperties = #'()
-    (Setzt man den Befehl unmittelbar vor die Note mit Liedtext, auf der 
-    der Phrasierungsbogen endet, dann werden die beiden zusammengerückt 
-    und der Bindestrich geht verloren. Nicht erstrebenswert!). Zur 
-    Auflösung des Befehls sollte nach der übergebundenen Note mit 
-    Liedtext `\unset melismaBusyProperties` folgen.
-    2.In der .ly-Datei muss in der entsprechenden Liedtextvariable im 
-    \lyricmode direkt vor der Silbe, an der in den Noten der Legatobogen 
-    beginnt, der Befehl \set ignoreMelismata = ##t gesetzt werden. Zur 
-    Auflösung des Befehls sollte nach der Silbe auf der übergebundenen 
-    Note \unset melisma gesetzt werden.</miscellaneous-field>
+      <miscellaneous-field name="description">middle syllables aligned to slurred notes are swallowed by musicxml2ly.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
