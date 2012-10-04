@@ -3,25 +3,15 @@
 % automatically converted by musicxml2ly from slur-lyrics.xml
 
 \header {
-    texidoc = "Soll eine Silbe unter einer Note stehen, an der ein 
-    Legatobogen endet bzw. die manuell mit der davor stehenden Note 
-    verbalkt wurde, dann kann dies über zwei Lösungsansätze erreicht 
-    werden:
-    1. In der .ly-Datei muss in der entsprechenden Notenvariable direkt 
-    vor der Note mit Liedtext, an der der Legatobogen beginnt, der Befehl 
-    \set melismaBusyProperties = #'()
-    (Setzt man den Befehl unmittelbar vor die Note mit Liedtext, auf der 
-    der Phrasierungsbogen endet, dann werden die beiden zusammengerückt 
-    und der Bindestrich geht verloren. Nicht erstrebenswert!). Zur 
-    Auflösung des Befehls sollte nach der übergebundenen Note mit 
-    Liedtext `\unset melismaBusyProperties` folgen.
-    2.In der .ly-Datei muss in der entsprechenden Liedtextvariable im 
-    \lyricmode direkt vor der Silbe, an der in den Noten der Legatobogen 
-    beginnt, der Befehl \set ignoreMelismata = ##t gesetzt werden. Zur 
-    Auflösung des Befehls sollte nach der Silbe auf der übergebundenen 
-    Note \unset melisma gesetzt werden."
+    texidoc = "middle syllables aligned to slurred notes are swallowed by musicxml2ly."
+    title = "musicxml2ly swallows syllables"
     }
 
+\layout {
+    \context { \Score
+        autoBeaming = ##f
+        }
+    }
 PartPOneVoiceOne =  {
     \clef "treble" \key c \major \time 4/4 c''2 ( b'2 ) | % 2
     c''1 }
