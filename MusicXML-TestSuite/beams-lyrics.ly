@@ -11,16 +11,12 @@
 \layout {
     \context { \Score
         autoBeaming = ##f
-        %\autoBeamOff
         }
     }
 PartPOneVoiceOne =  {
-    \clef "treble" \key c \major \time 4/4 
+    \clef "treble" \key c \major \time 4/4 c'8. [ c'16 ] c'2. }
 
-c'8. [ c'16 ] c'2. }
-
-PartPOneVoiceOneLyricsOne =  \lyricmode { %\set ignoreMelismata = ##t
-Syl -- la -- ble }
+PartPOneVoiceOneLyricsOne =  \lyricmode { Syl -- ble }
 
 % The score definition
 \score {
