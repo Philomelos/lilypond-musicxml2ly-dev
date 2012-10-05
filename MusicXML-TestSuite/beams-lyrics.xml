@@ -4,11 +4,12 @@
 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
   <work>
-    <work-title>manual beams and lyrics</work-title>
+    <work-title>beams and lyrics</work-title>
   </work>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Bei manuell gesetzten Balken verschwinden im Liedtext Silben.</miscellaneous-field>
+      <miscellaneous-field name="description">Under some circumstances syllables aligned to notes 
+      with manual beams are swallowed by musicxml2ly.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -20,7 +21,7 @@
   <part id="P1">
     <measure number="1">
       <attributes>
-        <divisions>4</divisions>
+        <divisions>6720</divisions>
         <key>
           <fifths>0</fifths>
           <mode>major</mode>
@@ -39,12 +40,16 @@
           <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>3</duration>
+        <duration>5040</duration>
+        <!--<duration>3360</duration>-->
+        <!--<duration>1680</duration>-->
+        <!--<duration>2520</duration>-->
         <voice>1</voice>
         <type>eighth</type>
+        <!--<type>16th</type>-->
         <dot/>
-	<stem default-y="-48.61">down</stem>
-	<beam number="1">begin</beam>
+	      <stem default-y="-48.61">down</stem>
+	      <beam number="1">begin</beam>
         <lyric number="1">
           <syllabic>begin</syllabic>
           <text font-family="CenturySchL" font-size="12" font-weight="normal" font-style="normal">Syl</text>
@@ -55,11 +60,15 @@
           <step>C</step>
           <octave>4</octave>
         </pitch>
-        <duration>1</duration>
+        <duration>1680</duration>
+        <!--<duration>3360</duration>-->
+        <!--<duration>840</duration>-->
         <voice>1</voice>
         <type>16th</type>
+        <!--<type>eighth</type>-->
+        <!--<type>32nd</type>-->
         <beam number="1">end</beam>
-	<lyric number="1">
+	      <lyric number="1">
           <syllabic>middle</syllabic>
           <text>la</text>
         </lyric>
@@ -69,11 +78,11 @@
           <step>C</step>
           <octave>4</octave>
         </pitch>
-	<duration>12</duration>
-        <dot/>
+	      <duration>20160</duration>
         <voice>1</voice>
         <type>half</type>
-	<lyric number="1">
+        <dot/>
+		    <lyric number="1">
           <syllabic>end</syllabic>
           <text>ble</text>
         </lyric>
