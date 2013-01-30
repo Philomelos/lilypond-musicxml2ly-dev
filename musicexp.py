@@ -1409,7 +1409,6 @@ class StemEvent (Event):
         self.value = None
     def pre_chord_ly (self):
 	if self.value:
-	    print self.value
 	    return "\\%s" % self.value
 	else:
 	    return ''
