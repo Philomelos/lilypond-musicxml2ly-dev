@@ -55,7 +55,6 @@ class Output_printer:
         self._file = file
 
     def dump_version (self):
-        self.newline ()
         self.print_verbatim ('\\version "2.15.95"')
         self.newline ()
 
