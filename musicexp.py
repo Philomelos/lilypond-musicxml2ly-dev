@@ -1409,10 +1409,8 @@ class StemEvent (Event):
         self.value = None
     def pre_chord_ly (self):
 	if self.value:
-	    if self.value == "None" or self.value == "double":
-		return "\\stemNeutral"
-	    else:
-		return "\\%s" % self.value
+	    print self.value
+	    return "\\%s" % self.value
 	else:
 	    return ''
     def pre_note_ly (self, is_chord_element):

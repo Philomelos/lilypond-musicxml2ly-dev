@@ -1624,8 +1624,8 @@ stem_value_dict = {
     'down': 'stemDown',
     'up': 'stemUp',
     'double': None, # TODO: Implement
-    'none': 'stemNeutral', # TODO: Implement
-    }
+    'none': 'stemNeutral'
+}
 
 def musicxml_stemvalue_to_lily (sv):
       values = []
@@ -1633,10 +1633,8 @@ def musicxml_stemvalue_to_lily (sv):
       stem_value = musicexp.StemEvent ()
       if value:
             stem_value.value = value
-      if stem_value.value:
             values.append (stem_value)
       return values
-
 
 def musicxml_chordpitch_to_lily (mxl_cpitch):
     r = musicexp.ChordPitch ()
@@ -1944,10 +1942,11 @@ def musicxml_note_to_lily_main_event (n):
         for s in styles:
             event.add_associated_event (s)
 
-    stems = n.get_named_children ('stem')
-    for svs in stems:
-          values = musicxml_stemvalue_to_lily (svs)
-          for v in values:
+    if conversion_settings.convert_stem_directions:
+        stems = n.get_named_children ('stem')
+        for svs in stems:
+            values = musicxml_stemvalue_to_lily (svs)
+            for v in values:
                 event.add_associated_event (v)
     return event
 
@@ -2827,7 +2826,13 @@ information.""") % 'lilypond')
                   dest="convert_page_layout",
                   help=_ ("do not convert the exact page layout and breaks"))
 
-    p.add_option ('--no-beaming',
+    p.add_option ('--nsd', '--no-stem-directions',
+                  action="store_false",
+                  default=True,
+                  dest="convert_stem_directions",
+                  help=_ ("ignore stem directions from MusicXML, use lilypond's automatic stemming instead"))
+
+    p.add_option ('--nb', '--no-beaming',
                   action="store_false",
                   default=True,
                   dest="convert_beaming",
@@ -3201,8 +3206,10 @@ def main ():
         musicexp.set_pitch_language (options.language)
         needed_additional_definitions.append (options.language)
         additional_definitions[options.language] = "\\language \"%s\"\n" % options.language
+
     conversion_settings.ignore_beaming = not options.convert_beaming
     conversion_settings.convert_page_layout = options.convert_page_layout
+    conversion_settings.convert_stem_directions = options.convert_stem_directions
 
     # Allow the user to leave out the .xml or xml on the filename
     basefilename = args[0].decode('utf-8')
