@@ -3,12 +3,15 @@ lilypond-musicxml2ly-dev
 
 A fork of musicxml2ly for philomelos.net
 
-v0.1.12:
-* added the command line options --sn / --string-numbers [t|f] to activate / deactivate the string number stencil.
+v0.1.13:
+* added the command line options --nsd / --no-stem-directions to ignore stem direction indications given in MusicXML, and use
+lilypond's automatic stemming instead.
+* more to come...
 
 v0.1.12:
 * added the command line options --tc / --tabclef [tab|moderntab] to be able to switch between the two styles of the tab clef.
 * added support for ChordNames transposition
+* added the command line options --sn / --string-numbers [t|f] to activate / deactivate the string number stencil.
 
 v0.1.11:
 * implemented recognition of stem values "up" and "down"
