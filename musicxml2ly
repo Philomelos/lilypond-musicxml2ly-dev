@@ -53,10 +53,11 @@ conversion_settings = Conversion_Settings ()
 # whenever we need to change a setting or add/remove an engraver, we can access
 # this layout and add the corresponding settings
 layout_information = musicexp.Layout ()
-
+# Use a global variable to store the setting needed inside a \paper block.
+paper = musicexp.Paper ()
+    
 needed_additional_definitions = []
 additional_definitions = {
-
   "tuplet-note-wrapper": """      % a formatter function, which is simply a wrapper around an existing
       % tuplet formatter function. It takes the value returned by the given
       % function and appends a note of given length.
@@ -87,7 +88,6 @@ def round_to_two_digits (val):
     return round (val * 100) / 100
 
 def extract_paper_information (tree):
-    paper = musicexp.Paper ()
     defaults = tree.get_maybe_exist_named_child ('defaults')
     if not defaults:
         return None
@@ -372,6 +372,8 @@ def extract_score_structure (part_list, staffinfo):
         partname = el.get_maybe_exist_named_child ("part-name-display")
         if partname:
             staff.instrument_name = extract_display_text (partname)
+        if staff.instrument_name:
+            paper.indent = max(paper.indent, len(staff.instrument_name))
 
         partdisplay = el.get_maybe_exist_named_child ('part-abbreviation')
         if partdisplay:
@@ -381,6 +383,8 @@ def extract_score_structure (part_list, staffinfo):
         if partdisplay:
             staff.short_instrument_name = extract_display_text (partdisplay)
         # TODO: Read in the MIDI device / instrument
+        if staff.short_instrument_name:
+            paper.short_indent = max(paper.short_indent, len(staff.short_instrument_name))
 
         return staff
 

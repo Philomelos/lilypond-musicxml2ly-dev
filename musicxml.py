@@ -1184,8 +1184,7 @@ class PerMinute (Music_xml_node):
 class Print (Music_xml_node):
     pass
 
-
-
+    
 ## need this, not all classes are instantiated
 ## for every input file. Only add those classes, that are either directly
 ## used by class name or extend Music_xml_node in some way!

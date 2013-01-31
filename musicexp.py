@@ -840,6 +840,8 @@ class Paper:
         self.system_right_margin = -1
         self.system_distance = -1
         self.top_system_distance = -1
+        self.indent = 0
+        self.short_indent = 0
 
     def print_length_field (self, printer, field, value):
         if value >= 0:
@@ -862,6 +864,14 @@ class Paper:
         #        system_right_margin in LilyPond?
         self.print_length_field (printer, "between-system-space", self.system_distance)
         self.print_length_field (printer, "page-top-space", self.top_system_distance)
+        # TODO: Compute the indentation with the instrument name lengths
+
+        # TODO: font width ?
+        char_per_cm = 120/(self.page_width-self.right_margin-self.left_margin)
+        if (self.indent != 0):
+            self.print_length_field (printer, "indent", self.indent/char_per_cm)
+        if (self.short_indent != 0):
+            self.print_length_field (printer, "short-indent", self.short_indent/char_per_cm)
 
         printer.dump ('}')
         printer.newline ()
