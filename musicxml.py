@@ -797,6 +797,9 @@ class Part (Music_xml_node):
             return attributes
 
     def extract_voices (part):
+        # The last indentified voice
+        last_voice = None
+
         voices = {}
         measures = part.get_typed_children (Measure)
         elements = []
@@ -815,7 +818,13 @@ class Part (Music_xml_node):
             elif isinstance (n, Note):
                 # TODO: Check whether we shall really use "None" here, or
                 #       rather use "1" as the default?
-                vid = "None"
+                if n.get_maybe_exist_named_child(u'chord'):
+                    vid = last_voice
+                else:
+                    vid = "None"
+
+            if (vid != None):
+                last_voice = vid
 
             staff_id = n.get_maybe_exist_named_child (u'staff')
             sid = None
@@ -832,6 +841,7 @@ class Part (Music_xml_node):
             if vid and sid and not n.get_maybe_exist_typed_child (Grace):
                 if not voice_to_staff_dict.has_key (vid):
                     voice_to_staff_dict[vid] = sid
+
         # invert the voice_to_staff_dict into a staff_to_voice_dict (since we
         # need to assign staff-assigned objects like clefs, times, etc. to
         # all the correct voices. This will never work entirely correct due
@@ -843,7 +853,6 @@ class Part (Music_xml_node):
             else:
                 staff_to_voice_dict[s].append (v)
 
-
         start_attr = None
         assign_to_next_note = []
         id = None
@@ -852,7 +861,13 @@ class Part (Music_xml_node):
             if voice_id:
                 id = voice_id.get_text ()
             else:
-                id = "None"
+                if n.get_maybe_exist_typed_child (get_class ('chord')):
+                    id = last_voice
+                else:
+                    id = "None"
+
+            if (id != "None"):
+                last_voice = id
 
             # We don't need backup/forward any more, since we have already 
             # assigned the correct onset times. 
