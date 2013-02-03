@@ -794,15 +794,12 @@ class Lyrics:
         self.lyrics_syllables = []
 
     def print_ly (self, printer):
-        printer.dump ("\lyricmode {")
-        for l in self.lyrics_syllables:
-            printer.dump ("%s " % l)
-        printer.dump ("}")
+        printer.dump (self.ly_expression ())
 
     def ly_expression (self):
         lstr = "\lyricmode {\n  "
         for l in self.lyrics_syllables:
-            lstr += l + " "
+            lstr += l
         lstr += "\n}"
         return lstr
 

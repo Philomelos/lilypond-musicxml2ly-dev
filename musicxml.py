@@ -541,6 +541,13 @@ class Syllabic (Music_xml_node):
     def continued (self):
         text = self.get_text()
         return (text == "begin") or (text == "middle")
+    def begin (self):
+        return (text == "begin")
+    def middle (self):
+        return (text == "middle")
+    def end (self):
+        return (text == "end")
+
 class Elision (Music_xml_node):
     pass
 class Extend (Music_xml_node):
