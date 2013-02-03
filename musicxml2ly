@@ -2009,6 +2009,7 @@ class LilyPondVoiceBuilder:
         self.ignore_skips = False
         self.has_relevant_elements = False
         self.measure_length = Rational (4, 4)
+        self.stay_here = False
 
     def _insert_multibar (self):
         layout_information.set_context_item ('Score', 'skipBars = ##t')
@@ -2085,41 +2086,42 @@ class LilyPondVoiceBuilder:
         self.add_barline (b)
 
     def jumpto (self, moment):
-        current_end = self.end_moment + self.pending_multibar
-        diff = moment - current_end
+        if (not self.stay_here):
+            current_end = self.end_moment + self.pending_multibar
+            diff = moment - current_end
 
-        if diff < Rational (0):
-            ly.warning (_ ('Negative skip %s (from position %s to %s)') % 
-                           (diff, current_end, moment))
-            diff = Rational (0)
+            if diff < Rational (0):
+                ly.warning (_ ('Negative skip %s (from position %s to %s)') %
+                            (diff, current_end, moment))
+                diff = Rational (0)
 
-        if diff > Rational (0) and not (self.ignore_skips and moment == 0):
-            skip = musicexp.SkipEvent()
-            duration_factor = 1
-            duration_log = {1: 0, 2: 1, 4:2, 8:3, 16:4, 32:5, 64:6, 128:7, 256:8, 512:9}.get (diff.denominator (), -1)
-            duration_dots = 0
-            # TODO: Use the time signature for skips, too. Problem: The skip
-            #       might not start at a measure boundary!
-            if duration_log > 0: # denominator is a power of 2...
-                if diff.numerator () == 3:
-                    duration_log -= 1
-                    duration_dots = 1
+            if diff > Rational (0) and not (self.ignore_skips and moment == 0):
+                skip = musicexp.SkipEvent()
+                duration_factor = 1
+                duration_log = {1: 0, 2: 1, 4:2, 8:3, 16:4, 32:5, 64:6, 128:7, 256:8, 512:9}.get (diff.denominator (), -1)
+                duration_dots = 0
+                # TODO: Use the time signature for skips, too. Problem: The skip
+                #       might not start at a measure boundary!
+                if duration_log > 0: # denominator is a power of 2...
+                    if diff.numerator () == 3:
+                        duration_log -= 1
+                        duration_dots = 1
+                    else:
+                        duration_factor = Rational (diff.numerator ())
                 else:
-                    duration_factor = Rational (diff.numerator ())
-            else:
-                # for skips of a whole or more, simply use s1*factor
-                duration_log = 0
-                duration_factor = diff
-            skip.duration.duration_log = duration_log
-            skip.duration.factor = duration_factor
-            skip.duration.dots = duration_dots
+                    # for skips of a whole or more, simply use s1*factor
+                    duration_log = 0
+                    duration_factor = diff
+                skip.duration.duration_log = duration_log
+                skip.duration.factor = duration_factor
+                skip.duration.dots = duration_dots
 
-            evc = musicexp.ChordEvent ()
-            evc.elements.append (skip)
-            self.add_music (evc, diff, False)
+                evc = musicexp.ChordEvent ()
+                evc.elements.append (skip)
+                self.add_music (evc, diff, False)
 
-        if diff > Rational (0) and moment == 0:
-            self.ignore_skips = False
+            if diff > Rational (0) and moment == 0:
+                self.ignore_skips = False
 
     def last_event_chord (self, starting_at):
         value = None
@@ -2280,9 +2282,17 @@ def musicxml_voice_to_lily_voice (voice):
 
         # Start any new multimeasure rests
         if (rest and rest.is_whole_measure ()):
+            if pending_chordnames:
+                chordnames_builder.jumpto (n._when)
+                chordnames_builder.stay_here = True
+            if pending_figured_bass:
+                figured_bass_builder.jumpto (n._when)
+                figured_bass_builder.stay_here = True
+            if pending_fretboards:
+                fretboards_builder.jumpto (n._when)
+                fretboards_builder.stay_here = True
             voice_builder.add_multibar_rest (n._duration)
             continue
-
 
         if isinstance (n, musicxml.Direction):
             for a in musicxml_direction_to_lily (n):
@@ -2387,6 +2397,8 @@ def musicxml_voice_to_lily_voice (voice):
         if pending_figured_bass:
             try:
                 figured_bass_builder.jumpto (n._when)
+                if (figured_bass_builder.stay_here):
+                    figured_bass_builder.stay_here = False
             except NegativeSkip, neg:
                 pass
             for fb in pending_figured_bass:
@@ -2402,6 +2414,8 @@ def musicxml_voice_to_lily_voice (voice):
         if pending_chordnames:
             try:
                 chordnames_builder.jumpto (n._when)
+                if (chordnames_builder.stay_here):
+                    chordnames_builder.stay_here = False
             except NegativeSkip, neg:
                 pass
             for cn in pending_chordnames:
@@ -2413,6 +2427,8 @@ def musicxml_voice_to_lily_voice (voice):
 	if pending_fretboards:
             try:
                 fretboards_builder.jumpto (n._when)
+                if (fretboards_builder.stay_here):
+                    fretboards_builder.stay_here = False
             except NegativeSkip, neg:
                 pass
             for fb in pending_fretboards:
