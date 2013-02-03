@@ -1632,13 +1632,13 @@ stem_value_dict = {
 }
 
 def musicxml_stemvalue_to_lily (sv):
-      values = []
-      value = stem_value_dict.get (sv.get_text (), None)
-      stem_value = musicexp.StemEvent ()
-      if value:
-            stem_value.value = value
-            values.append (stem_value)
-      return values
+    values = []
+    value = stem_value_dict.get (sv.get_text (), None)
+    stem_value = musicexp.StemEvent ()
+    if value:
+        stem_value.value = value
+        values.append (stem_value)
+    return values
 
 def musicxml_chordpitch_to_lily (mxl_cpitch):
     r = musicexp.ChordPitch ()

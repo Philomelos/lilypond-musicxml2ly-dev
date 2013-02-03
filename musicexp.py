@@ -982,10 +982,17 @@ class ChordEvent (NestedMusic):
             global previous_pitch
             pitches = []
             basepitch = None
+            stem = None
             for x in note_events:
+                if(x.associated_events):
+                    for aev in x.associated_events:
+                        if (isinstance(aev, StemEvent) and aev.value):
+                            stem = aev
                 pitches.append (x.chord_element_ly ())
                 if not basepitch:
                     basepitch = previous_pitch
+            if stem:
+                printer (stem.ly_expression ())
             printer ('<%s>' % string.join (pitches))
             previous_pitch = basepitch
             duration = self.get_duration ()
@@ -1422,7 +1429,7 @@ class StemEvent (Event):
 	else:
 	    return ''
     def pre_note_ly (self, is_chord_element):
-	return ''
+        return ''
     def ly_expression (self):
         return self.pre_chord_ly ()
 
