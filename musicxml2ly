@@ -1954,7 +1954,7 @@ def musicxml_note_to_lily_main_event (n):
                 event.add_associated_event (v)
     return event
 
-def musicxml_lyrics_to_text (lyrics, beamed):
+def musicxml_lyrics_to_text (lyrics, beamed, in_slur):
     # TODO: Implement text styles for lyrics syllables
     continued = False
     extended = False
@@ -1981,8 +1981,10 @@ def musicxml_lyrics_to_text (lyrics, beamed):
     elif text == "_" and extended:
         return " __ "
     elif continued and text:
-        if beamed == "begin":
-            return musicxml.escape_ly_output_string (text) + "_"
+        if (beamed == "begin" or in_slur == "start"):
+            return musicxml.escape_ly_output_string (text) + "-_"
+        elif beamed == "end":
+            return musicxml.escape_ly_output_string (text) + "- -- "
         else:
             return musicxml.escape_ly_output_string (text) + " -- "
     elif continued:
@@ -2344,7 +2346,7 @@ def musicxml_voice_to_lily_voice (voice):
         if main_event and not first_pitch:
             first_pitch = main_event.pitch
         # ignore lyrics for notes inside a slur, tie, chord or beam
-        ignore_lyrics = inside_slur or is_tied or is_chord #or is_beamed
+        ignore_lyrics = is_tied or is_chord #or is_beamed or inside_slur
 
         if main_event and hasattr (main_event, 'drum_type') and main_event.drum_type:
             modes_found['drummode'] = True
@@ -2571,17 +2573,22 @@ def musicxml_voice_to_lily_voice (voice):
         if not rest and not ignore_lyrics:
             note_lyrics_processed = []
             note_lyrics_elements = n.get_typed_children (musicxml.Lyric)
-            beamed = None
-            if (n.get_maybe_exist_named_child ('beam') != None):
-                beamed = n.get_maybe_exist_named_child ('beam').get_text ()
+            beamed = n.get_maybe_exist_named_child ('beam')
+            if ( beamed != None):
+                beamed = beamed.get_text ()
+            in_slur = None
+            if ( n.get_maybe_exist_named_child ('notations') != None):
+                in_slur = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
+                if ( in_slur != None):
+                    in_slur = in_slur.get_type ()
 
             for l in note_lyrics_elements:
                 if l.get_number () < 0:
                     for k in lyrics.keys ():
-                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed))
+                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed, in_slur))
                         note_lyrics_processed.append (k)
                 else:
-                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed))
+                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, in_slur))
                     note_lyrics_processed.append (l.number)
             for lnr in lyrics.keys ():
                 if not lnr in note_lyrics_processed:
