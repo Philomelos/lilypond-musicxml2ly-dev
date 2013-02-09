@@ -175,7 +175,17 @@ def extract_paper_information (tree):
     return paper
 
 
-
+credit_dict = {
+    None:None,
+    '':None,
+    'page number':None, #TODO: what is it used for ?
+    'title':'title',
+    'subtitle':'subtitle',
+    'composer':'composer',
+    'arranger':'arranger',
+    'lyricist':'poet',
+    'rights':'copyright'
+}
 # score information is contained in the <work>, <identification> or <movement-title> tags
 # extract those into a hash, indexed by proper lilypond header attributes
 def extract_score_information (tree):
@@ -205,10 +215,6 @@ def extract_score_information (tree):
 # TODO: Translation of opus element. Not to be confused with opus in LilyPond. MusicXML opus is a document element for opus DTD
     identifications = tree.get_named_children ('identification')
     for ids in identifications:
-        #if(not(work_title) and not(movement_title)):
-        #    print 'Missing title, looking in credits'
-        #    set_if_exists ('title', ids.get_title ())
-
         set_if_exists ('copyright', ids.get_rights ())
         set_if_exists ('composer', ids.get_composer ())
         set_if_exists ('arranger', ids.get_arranger ())
@@ -248,6 +254,20 @@ def extract_score_information (tree):
                                "wrong beaming information. All beaming "
                                "information in the MusicXML file will be "
                                "ignored") % app_description)
+
+    credits = tree.get_named_children ('credit')
+    for cred in credits:
+        type = credit_dict.get(cred.get_type ())
+        if (type == None):
+            pass
+        elif (type == 'title'):
+            if(not(work) and not(movement_title)):
+                set_if_exists ('title', cred.get_text ())
+            elif(not(movement_title)):
+                set_if_exists ('subtitle', cred.get_text ())
+        else:
+            set_if_exists (type, cred.get_text ())
+
 
     # TODO: Check for other unsupported features
     return header

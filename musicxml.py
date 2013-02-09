@@ -240,6 +240,21 @@ class Identification (Xml_node):
                     return mf.get_text () 
         return None
 
+class Credit (Xml_node):
+    def get_type (self):
+        type = self.get_maybe_exist_named_child('credit-type')
+        if (type != None):
+            return type.get_text()
+        else:
+            return None
+
+    def get_text (self):
+        words = self.get_maybe_exist_named_child('credit-words')
+        if (words != None):
+            return words.get_text ()
+        else:
+            return ''
+
 
 class Duration (Music_xml_node):
     def get_length (self):
@@ -1227,6 +1242,7 @@ class_dict = {
         'bend' : Bend,
         'bracket' : Bracket,
         'chord': Chord,
+        'credit': Credit,
         'dashes' : Dashes,
         'degree' : ChordModification,
         'dot': Dot,
