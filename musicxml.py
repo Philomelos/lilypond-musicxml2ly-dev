@@ -240,6 +240,7 @@ class Identification (Xml_node):
                     return mf.get_text () 
         return None
 
+
 class Duration (Music_xml_node):
     def get_length (self):
         dur = int (self.get_text ()) * Rational (1, 4)

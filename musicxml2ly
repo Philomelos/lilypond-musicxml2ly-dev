@@ -201,11 +201,14 @@ def extract_score_information (tree):
         # Use movement-title as subtitle
         if movement_title:
               set_if_exists ('subtitle', movement_title.get_text ())
-          
+
 # TODO: Translation of opus element. Not to be confused with opus in LilyPond. MusicXML opus is a document element for opus DTD
- 
     identifications = tree.get_named_children ('identification')
     for ids in identifications:
+        #if(not(work_title) and not(movement_title)):
+        #    print 'Missing title, looking in credits'
+        #    set_if_exists ('title', ids.get_title ())
+
         set_if_exists ('copyright', ids.get_rights ())
         set_if_exists ('composer', ids.get_composer ())
         set_if_exists ('arranger', ids.get_arranger ())
@@ -2573,9 +2576,9 @@ def musicxml_voice_to_lily_voice (voice):
         if not rest and not ignore_lyrics:
             note_lyrics_processed = []
             note_lyrics_elements = n.get_typed_children (musicxml.Lyric)
-            beamed = n.get_maybe_exist_named_child ('beam')
-            if ( beamed != None):
-                beamed = beamed.get_text ()
+            beamed = n.get_named_children('beam')
+            if ( len(beamed) != 0):
+                beamed = beamed[0].get_text ()
             in_slur = None
             if ( n.get_maybe_exist_named_child ('notations') != None):
                 in_slur = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
