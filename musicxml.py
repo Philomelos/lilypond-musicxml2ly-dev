@@ -250,8 +250,11 @@ class Credit (Xml_node):
 
     def find_type (self, credits):
         sizes = self.get_font_sizes (credits)
+        sizes.sort (reverse=True)
         ys = self.get_default_ys (credits)
+        ys.sort (reverse=True)
         xs = self.get_default_xs (credits)
+        xs.sort (reverse=True)
 
         # Words child of the self credit-element
         words = self.get_maybe_exist_named_child('credit-words')
@@ -285,6 +288,8 @@ class Credit (Xml_node):
         elif (size and size == min(sizes) and y == min(ys)):
             return 'rights'
         # Special cases for Finale NotePad
+        elif ((valign and (valign == 'top')) and (y and y == ys[1])):
+            return 'subtitle'
         elif ((valign and (valign == 'top')) and (x and x == min(xs))):
             return 'lyricist'
         elif ((valign and (valign == 'top')) and (y and y == min(ys))):
