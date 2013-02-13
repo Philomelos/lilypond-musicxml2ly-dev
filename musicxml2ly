@@ -256,17 +256,24 @@ def extract_score_information (tree):
                                "ignored") % app_description)
 
     credits = tree.get_named_children ('credit')
+    has_composer = False
     for cred in credits:
         type = credit_dict.get(cred.get_type ())
         if (type == None):
             type = credit_dict.get(cred.find_type (credits))
-        if (type == None):
-            pass
+        if (type == 'composer'):
+            if(has_composer):
+                type = 'poet'
+            else:
+                has_composer = True
+            set_if_exists (type, cred.get_text ())
         elif (type == 'title'):
             if(not(work) and not(movement_title)):
                 set_if_exists ('title', cred.get_text ())
             elif(not(movement_title)):
                 set_if_exists ('subtitle', cred.get_text ())
+        elif (type == None):
+            pass
         else:
             set_if_exists (type, cred.get_text ())
 

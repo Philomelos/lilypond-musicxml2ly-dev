@@ -259,6 +259,7 @@ class Credit (Xml_node):
         x = None
         y = None
         halign = None
+        valign = None
         justify = None
         if (words != None):
             if hasattr(words, 'font-size'):
@@ -269,19 +270,33 @@ class Credit (Xml_node):
                 y = round(float(getattr(words, 'default-y')))
             if hasattr(words, 'halign'):
                 halign = getattr(words, 'halign')
+            if hasattr(words, 'valign'):
+                valign = getattr(words, 'valign')
             if hasattr(words, 'justify'):
                 justify = getattr(words, 'justify')
         if (size and size == max(sizes) and y and y == max(ys) and (justify or halign) and (justify == 'center' or halign == 'center')):
             return 'title'
-        elif (y and y > min(ys) and (justify or halign) and (justify == 'center' or halign == 'center')):
+        elif ((y and y > min(ys) and y < max(ys)) and ((justify or halign) and (justify == 'center' or halign == 'center'))):
             return 'subtitle'
-        elif ((justify or halign) and (justify == 'left' or halign == 'left')):
+        elif ((justify or halign) and (justify == 'left' or halign == 'left') and (not(x) or x == min(xs))):
             return 'lyricist'
-        elif ((justify or halign) and (justify == 'right' or halign == 'right')):
+        elif ((justify or halign) and (justify == 'right' or halign == 'right') and (not(x) or x == max(xs))):
             return 'composer'
         elif (size and size == min(sizes) and y == min(ys)):
             return 'rights'
-        return None
+        # Special cases for Finale NotePad
+        elif ((valign and (valign == 'top')) and (x and x == min(xs))):
+            return 'lyricist'
+        elif ((valign and (valign == 'top')) and (y and y == min(ys))):
+            return 'rights'
+        # Other special cases
+        elif ((valign and (valign == 'bottom'))):
+            return 'rights'
+        elif (len([item for item in range(len(ys)) if ys[item] == y]) == 2):
+            # The first one is the composer, the second one is the lyricist
+            return 'composer'
+
+        return None # no type recognized
 
     def get_font_sizes (self, credits):
         sizes = []
