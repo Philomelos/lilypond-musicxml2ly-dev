@@ -248,6 +248,65 @@ class Credit (Xml_node):
         else:
             return None
 
+    def find_type (self, credits):
+        sizes = self.get_font_sizes (credits)
+        ys = self.get_default_ys (credits)
+        xs = self.get_default_xs (credits)
+
+        # Words child of the self credit-element
+        words = self.get_maybe_exist_named_child('credit-words')
+        size = None
+        x = None
+        y = None
+        halign = None
+        justify = None
+        if (words != None):
+            if hasattr(words, 'font-size'):
+                size = int(getattr(words, 'font-size'))
+            if hasattr(words, 'default-x'):
+                x = round(float(getattr(words, 'default-x')))
+            if hasattr(words, 'default-y'):
+                y = round(float(getattr(words, 'default-y')))
+            if hasattr(words, 'halign'):
+                halign = getattr(words, 'halign')
+            if hasattr(words, 'justify'):
+                justify = getattr(words, 'justify')
+        if (size and size == max(sizes) and y and y == max(ys) and (justify or halign) and (justify == 'center' or halign == 'center')):
+            return 'title'
+        elif (y and y > min(ys) and (justify or halign) and (justify == 'center' or halign == 'center')):
+            return 'subtitle'
+        elif ((justify or halign) and (justify == 'left' or halign == 'left')):
+            return 'lyricist'
+        elif ((justify or halign) and (justify == 'right' or halign == 'right')):
+            return 'composer'
+        elif (size and size == min(sizes) and y == min(ys)):
+            return 'rights'
+        return None
+
+    def get_font_sizes (self, credits):
+        sizes = []
+        for cred in credits:
+            words = cred.get_maybe_exist_named_child('credit-words')
+            if ((words != None) and hasattr(words, 'font-size')):
+                sizes.append(getattr(words, 'font-size'))
+        return map(int, sizes)
+
+    def get_default_xs (self, credits):
+        default_xs = []
+        for cred in credits:
+            words = cred.get_maybe_exist_named_child('credit-words')
+            if ((words != None) and hasattr(words, 'default-x')):
+                default_xs.append(getattr(words, 'default-x'))
+        return map(round, map(float, default_xs))
+
+    def get_default_ys (self, credits):
+        default_ys = []
+        for cred in credits:
+            words = cred.get_maybe_exist_named_child('credit-words')
+            if ((words != None) and hasattr(words, 'default-y')):
+                default_ys.append(getattr(words, 'default-y'))
+        return map(round, map(float, default_ys))
+
     def get_text (self):
         words = self.get_maybe_exist_named_child('credit-words')
         if (words != None):

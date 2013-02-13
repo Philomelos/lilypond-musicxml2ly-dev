@@ -259,6 +259,8 @@ def extract_score_information (tree):
     for cred in credits:
         type = credit_dict.get(cred.get_type ())
         if (type == None):
+            type = credit_dict.get(cred.find_type (credits))
+        if (type == None):
             pass
         elif (type == 'title'):
             if(not(work) and not(movement_title)):
