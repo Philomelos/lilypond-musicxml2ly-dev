@@ -117,12 +117,13 @@ def extract_paper_information (tree):
         set_paper_variable ("page_height", pagelayout, 'page-height')
         set_paper_variable ("page_width", pagelayout, 'page-width')
 
-        pmargins = pagelayout.get_named_children ('page-margins')
-        for pm in pmargins:
-            set_paper_variable ("left_margin", pm, 'left-margin')
-            set_paper_variable ("right_margin", pm, 'right-margin')
-            set_paper_variable ("bottom_margin", pm, 'bottom-margin')
-            set_paper_variable ("top_margin", pm, 'top-margin')
+        if conversion_settings.convert_page_margins:
+            pmargins = pagelayout.get_named_children ('page-margins')
+            for pm in pmargins:
+                set_paper_variable ("left_margin", pm, 'left-margin')
+                set_paper_variable ("right_margin", pm, 'right-margin')
+                set_paper_variable ("bottom_margin", pm, 'bottom-margin')
+                set_paper_variable ("top_margin", pm, 'top-margin')
 
     systemlayout = defaults.get_maybe_exist_named_child ('system-layout')
     if systemlayout:
@@ -955,11 +956,11 @@ def musicxml_print_to_lily (el):
     #      page-number CDATA #IMPLIED
     #  >
     elts = []
-    if (hasattr (el, "new-system") and conversion_settings.convert_page_layout):
+    if (hasattr (el, "new-system") and conversion_settings.convert_system_breaks):
         val = getattr (el, "new-system")
         if (val == "yes"):
             elts.append (musicexp.Break ("break"))
-    if (hasattr (el, "new-page") and conversion_settings.convert_page_layout):
+    if (hasattr (el, "new-page") and conversion_settings.convert_page_breaks):
         val = getattr (el, "new-page")
         if (val == "yes"):
             elts.append (musicexp.Break ("pageBreak"))
@@ -2897,11 +2898,29 @@ information.""") % 'lilypond')
                   dest="convert_rest_positions",
                   help=_ ("do not convert exact vertical positions of rests"))
 
+    p.add_option ('--nsb', '--no-system-breaks',
+                  action="store_false",
+                  default=True,
+                  dest="convert_system_breaks",
+                  help=_ ("ignore system breaks"))
+
+    p.add_option ('--npb', '--no-page-breaks',
+                  action="store_false",
+                  default=True,
+                  dest="convert_page_breaks",
+                  help=_ ("ignore page breaks"))
+
+    p.add_option ('--npm', '--no-page-margins',
+                  action="store_false",
+                  default=True,
+                  dest="convert_page_margins",
+                  help=_ ("ignore page margins"))
+
     p.add_option ('--npl', '--no-page-layout',
                   action="store_false",
                   default=True,
                   dest="convert_page_layout",
-                  help=_ ("do not convert the exact page layout and breaks"))
+                  help=_ ("do not convert the exact page layout and breaks (shortcut for \"--nsb --npb --npm\" options)"))
 
     p.add_option ('--nsd', '--no-stem-directions',
                   action="store_false",
@@ -3292,6 +3311,14 @@ def main ():
 
     conversion_settings.ignore_beaming = not options.convert_beaming
     conversion_settings.convert_page_layout = options.convert_page_layout
+    if conversion_settings.convert_page_layout:
+        conversion_settings.convert_system_breaks = options.convert_system_breaks
+        conversion_settings.convert_page_breaks = options.convert_page_breaks
+        conversion_settings.convert_page_margins = options.convert_page_margins
+    else:
+        conversion_settings.convert_system_breaks = False
+        conversion_settings.convert_page_breaks = False
+        conversion_settings.convert_page_margins = False
     conversion_settings.convert_stem_directions = options.convert_stem_directions
 
     # Allow the user to leave out the .xml or xml on the filename
