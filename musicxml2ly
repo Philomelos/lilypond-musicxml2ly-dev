@@ -1986,7 +1986,7 @@ def musicxml_note_to_lily_main_event (n):
                 event.add_associated_event (v)
     return event
 
-def musicxml_lyrics_to_text (lyrics, beamed, in_slur):
+def musicxml_lyrics_to_text (lyrics, beamed, slurred):
     # TODO: Implement text styles for lyrics syllables
     continued = False
     extended = False
@@ -2009,24 +2009,27 @@ def musicxml_lyrics_to_text (lyrics, beamed, in_slur):
             extended = True
 
     if text == "-" and continued:
-        return " -- "
+        return "--"
     elif text == "_" and extended:
-        return " __ "
+        return "__"
     elif continued and text:
-        if (beamed == "begin" or in_slur == "start"):
-            return musicxml.escape_ly_output_string (text) + "-_"
-        elif beamed == "end":
-            return musicxml.escape_ly_output_string (text) + "- -- "
+        if options.convert_beaming:
+            if (beamed == "begin" or slurred == "start"):
+                return " \set ignoreMelismata = ##t " + musicxml.escape_ly_output_string (text)
+            elif (beamed == "end" or slurred == "stop"):
+                return " " + musicxml.escape_ly_output_string (text) + " -- \unset ignoreMelismata"
+            else:
+                return " " + musicxml.escape_ly_output_string (text) + " --"
         else:
-            return musicxml.escape_ly_output_string (text) + " -- "
+            return " " + musicxml.escape_ly_output_string (text) + " -- "
     elif continued:
         return "--"
     elif extended and text:
-        return musicxml.escape_ly_output_string (text) + "__"
+        return " " + musicxml.escape_ly_output_string (text) + " __"
     elif extended:
         return "__"
     elif text:
-        return musicxml.escape_ly_output_string (text) + " "
+        return " " + musicxml.escape_ly_output_string (text)
     else:
         return ""
 
@@ -2239,6 +2242,7 @@ def musicxml_voice_to_lily_voice (voice):
     fretboards_builder = LilyPondVoiceBuilder ()
     current_measure_length = Rational (4, 4)
     voice_builder.set_measure_length (current_measure_length)
+    in_slur = False
 
     for n in voice._elements:
         tie_started = False
@@ -2608,23 +2612,30 @@ def musicxml_voice_to_lily_voice (voice):
             beamed = n.get_named_children('beam')
             if ( len(beamed) != 0):
                 beamed = beamed[0].get_text ()
-            in_slur = None
+            slurred = None
             if ( n.get_maybe_exist_named_child ('notations') != None):
-                in_slur = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
-                if ( in_slur != None):
-                    in_slur = in_slur.get_type ()
+                slurred = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
+                if ( slurred != None):
+                    slurred = slurred.get_type ()
+                    if (slurred == "start" or slurred == "continue"):
+                        in_slur = True
 
             for l in note_lyrics_elements:
                 if l.get_number () < 0:
                     for k in lyrics.keys ():
-                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed, in_slur))
+                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed, slurred))
                         note_lyrics_processed.append (k)
                 else:
-                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, in_slur))
+                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, slurred))
                     note_lyrics_processed.append (l.number)
+            #print note_lyrics_processed
+
             for lnr in lyrics.keys ():
-                if not lnr in note_lyrics_processed:
+                if not ((lnr in note_lyrics_processed) or in_slur):
                     lyrics[lnr].append ("\skip4")
+
+            if (slurred == "stop"):
+                in_slur = False
 
         # Assume that a <tie> element only lasts for one note.
         # This might not be correct MusicXML interpretation, but works for
