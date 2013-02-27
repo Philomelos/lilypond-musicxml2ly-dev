@@ -2607,7 +2607,7 @@ def musicxml_voice_to_lily_voice (voice):
                     is_beamed = False
 
         # Extract the lyrics
-        if not rest and not ignore_lyrics:
+        if not (rest or ignore_lyrics):
             note_lyrics_processed = []
             note_lyrics_elements = n.get_typed_children (musicxml.Lyric)
             beamed = n.get_named_children('beam')
@@ -2622,14 +2622,14 @@ def musicxml_voice_to_lily_voice (voice):
                         in_slur = True
 
             for l in note_lyrics_elements:
-                if l.get_number () < 0:
-                    for k in lyrics.keys ():
-                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed, slurred))
-                        note_lyrics_processed.append (k)
-                else:
-                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, slurred))
-                    note_lyrics_processed.append (l.number)
-            #print note_lyrics_processed
+                if not(hasattr(n, "print-lyric") and getattr(n, "print-lyric") == "no"):
+                    if l.get_number () < 0:
+                        for k in lyrics.keys ():
+                            lyrics[k].append (musicxml_lyrics_to_text (l, beamed, slurred))
+                            note_lyrics_processed.append (k)
+                    else:
+                        lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, slurred))
+                        note_lyrics_processed.append (l.number)
 
             for lnr in lyrics.keys ():
                 if not ((lnr in note_lyrics_processed) or in_slur):
