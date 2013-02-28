@@ -1987,7 +1987,7 @@ def musicxml_note_to_lily_main_event (n):
                 event.add_associated_event (v)
     return event
 
-def musicxml_lyrics_to_text (lyrics, beamed, slurred):
+def musicxml_lyrics_to_text (lyrics, ignoremelismata):
     # TODO: Implement text styles for lyrics syllables
     continued = False
     extended = False
@@ -2015,9 +2015,9 @@ def musicxml_lyrics_to_text (lyrics, beamed, slurred):
         return "__"
     elif continued and text:
         if options.convert_beaming:
-            if (beamed == "begin" or slurred == "start"):
+            if (ignoremelismata == "on"):
                 return " \set ignoreMelismata = ##t " + musicxml.escape_ly_output_string (text)
-            elif (beamed == "end" or slurred == "stop"):
+            elif (ignoremelismata == "off"):
                 return " " + musicxml.escape_ly_output_string (text) + " -- \unset ignoreMelismata"
             else:
                 return " " + musicxml.escape_ly_output_string (text) + " --"
@@ -2245,7 +2245,7 @@ def musicxml_voice_to_lily_voice (voice):
     voice_builder.set_measure_length (current_measure_length)
     in_slur = False
 
-    for n in voice._elements:
+    for idx, n in enumerate(voice._elements):
         tie_started = False
         if n.get_name () == 'forward':
             continue
@@ -2613,26 +2613,39 @@ def musicxml_voice_to_lily_voice (voice):
             beamed = n.get_named_children('beam')
             if ( len(beamed) != 0):
                 beamed = beamed[0].get_text ()
+            else:
+                beamed = None
             slurred = None
+            tied = None
             if ( n.get_maybe_exist_named_child ('notations') != None):
                 slurred = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
                 if ( slurred != None):
                     slurred = slurred.get_type ()
                     if (slurred == "start" or slurred == "continue"):
-                        in_slur = True
+                        in_slur == True
+                tied = n.get_named_child ('notations').get_maybe_exist_named_child ('tied')
+                if ( tied != None):
+                    tied = tied.get_type ()
+
+            if (beamed == "begin" or slurred == "start") and (len(voice._elements[idx+1].get_typed_children (musicxml.Lyric)) != 0):
+                ignoremelismata = "on"
+            elif (beamed == "end" or slurred == "stop") and (len(note_lyrics_elements) != 0):
+                ignoremelismata = "off"
+            else:
+                ignoremelismata = None
 
             for l in note_lyrics_elements:
                 if not(hasattr(n, "print-lyric") and getattr(n, "print-lyric") == "no"):
                     if l.get_number () < 0:
                         for k in lyrics.keys ():
-                            lyrics[k].append (musicxml_lyrics_to_text (l, beamed, slurred))
+                            lyrics[k].append (musicxml_lyrics_to_text (l, ignoremelismata))
                             note_lyrics_processed.append (k)
                     else:
-                        lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, slurred))
+                        lyrics[l.number].append(musicxml_lyrics_to_text (l, ignoremelismata))
                         note_lyrics_processed.append (l.number)
 
             for lnr in lyrics.keys ():
-                if not ((lnr in note_lyrics_processed) or in_slur):
+                if not ((lnr in note_lyrics_processed) or (ignoremelismata == None and (beamed == None or not(in_slur) or tied == None))):
                     lyrics[lnr].append ("\skip4")
 
             if (slurred == "stop"):
