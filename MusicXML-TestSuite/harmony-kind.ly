@@ -1,9 +1,8 @@
-
-\version "2.15.24"
+\version "2.17.6"
 % automatically converted by musicxml2ly from harmony-kind.xml
 
 \header {
-    texidoc = "Test file for all values of the <kind> element in which all (supported) types of chords are defined. "
+    miscellaneous = "Test file for all values of the <kind> element in which all (supported) types of chords are defined. "
     title = "chord types"
     }
 
@@ -87,7 +86,7 @@ PartPOneVoiceOneChords =  \chordmode {
     s1 | % 27
     s1 \bar "||"
     s1 | % 29
-    c1:1.5 | \barNumberCheck #30
+    \powerChords c1:1.5 | \barNumberCheck #30
     s1 \bar "||"
     s1 \bar "||"
     c1:1 \bar "|."
@@ -106,20 +105,16 @@ PartPOneVoiceOneLyricsOne =  \lyricmode { major minor augmented
     <<
  <<
             <<
- \context ChordNames = "PartPOneVoiceOneChords"
-                \PartPOneVoiceOneChords
+ \context ChordNames = "PartPOneVoiceOneChords" {
+                    \PartPOneVoiceOneChords}
                 \new Staff <<
                     \context Staff << 
-                        \context Voice = "PartPOneVoiceOne" { \PartPOneVoiceOne }
+                        \context Voice = "PartPOneVoiceOne" {  \PartPOneVoiceOne }
                         \new Lyrics \lyricsto "PartPOneVoiceOne" \PartPOneVoiceOneLyricsOne
                         >>
-                    >>
-                >>
-            
-            >>
-        >>
-    \layout {}
+                    >> >>
+            >> >> \layout {}
     % To create MIDI output, uncomment the following line:
-    %  \midi {}
+    %  \midi {\tempo 4 = 100 }
     }
 

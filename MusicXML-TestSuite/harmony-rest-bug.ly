@@ -1,9 +1,8 @@
-
-\version "2.15.24"
+\version "2.17.6"
 % automatically converted by musicxml2ly from harmony-rest-bug.xml
 
 \header {
-    texidoc = "Chord symbols don't show up above full measure rests."
+    miscellaneous = "Chord symbols don't show up above full measure rests."
     title = "harmony above rest"
     }
 
@@ -13,14 +12,13 @@
         autoBeaming = ##f
         }
     }
-PartPOneVoiceOne =  {
+PartPOneVoiceOne =  \relative c'' {
     \clef "treble" \key c \major | % 1
     R1 | % 2
-    \clef "treble" \key c \major c''1 }
+    \clef "treble" \key c \major c1 }
 
 PartPOneVoiceOneChords =  \chordmode {
     | % 1
-    s1 | % 2
     d1:5 }
 
 
@@ -29,19 +27,15 @@ PartPOneVoiceOneChords =  \chordmode {
     <<
  <<
             <<
- \context ChordNames = "PartPOneVoiceOneChords"
-                \PartPOneVoiceOneChords
+ \context ChordNames = "PartPOneVoiceOneChords" {
+                    \PartPOneVoiceOneChords}
                 \new Staff <<
                     \context Staff << 
-                        \context Voice = "PartPOneVoiceOne" { \PartPOneVoiceOne }
+                        \context Voice = "PartPOneVoiceOne" {  \PartPOneVoiceOne }
                         >>
-                    >>
-                >>
-            
-            >>
-        >>
-    \layout {}
+                    >> >>
+            >> >> \layout {}
     % To create MIDI output, uncomment the following line:
-    %  \midi {}
+    %  \midi {\tempo 4 = 100 }
     }
 

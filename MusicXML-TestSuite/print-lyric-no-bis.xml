@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<!DOCTYPE score-partwise PUBLIC
+	    "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+	    "http://www.musicxml.org/dtds/partwise.dtd">
+	<score-partwise version="2.0">
+	  <movement-title>print-lyric="no"</movement-title>
+	  <identification>
+	    <miscellaneous>
+	      <miscellaneous-field name="description">Mit dem Attribut print-lyric="no" im note-Element soll die Ausgabe von Liedtext fÃŒr bestimmte Noten bzw. Stimmen unterbunden werden kÃ¶nnen.</miscellaneous-field>
+	        </miscellaneous>
+	    </identification>
+	  <part-list>
+	    <score-part id="P1">
+	      <part-name></part-name>
+	    </score-part>
+	  </part-list>
+  <part id="P1">
+	    <measure number="1">
+      <attributes>
+        <divisions>4</divisions>
+	        <key>
+          <fifths>0</fifths>
+	          <mode>major</mode>
+	        </key>
+        <time symbol="common">
+	          <beats>4</beats>
+	          <beat-type>4</beat-type>
+	        </time>
+	        <clef>
+	          <sign>G</sign>
+	          <line>2</line>
+	        </clef>
+	      </attributes>
+	                <note print-lyric="no">
+	                        <pitch>
+	                                <step>F</step>
+	                                <octave>4</octave>
+	                        </pitch>
+                        <duration>8</duration>
+	                        <voice>1</voice>
+	                        <type>half</type>
+                        <lyric number="1">
+                                <syllabic>single</syllabic>
+	                                <text font-family="CenturySchL" font-size="10" font-weight="normal" font-style="normal" xml:lang="en">Blab</text>
+	                        </lyric>
+	                </note>
+                <note>
+	                        <pitch>
+	                                <step>F</step>
+	                                <octave>4</octave>
+	                        </pitch>
+	                        <duration>8</duration>
+	                        <voice>1</voice>
+	                        <type>half</type>
+	                        <lyric number="1">
+	                                <syllabic>single</syllabic>
+	                                <text font-family="CenturySchL" font-size="10" font-weight="normal" font-style="normal" xml:lang="en">Blub</text>
+	                        </lyric>
+	                </note>
+	     </measure>
+	     <measure number="2">
+	                <note print-lyric="yes">
+	                        <pitch>
+	                                <step>F</step>
+	                                <octave>4</octave>
+	                        </pitch>
+	                        <duration>8</duration>
+	                        <voice>1</voice>
+	                        <type>half</type>
+	                        <lyric number="1">
+	                                <syllabic>single</syllabic>
+	                                <text font-family="CenturySchL" font-size="10" font-weight="normal" font-style="normal" xml:lang="en">Blib</text>
+	                        </lyric>
+                </note>
+                <note print-lyric="no">
+	                        <pitch>
+	                                <step>F</step>
+                                <octave>4</octave>
+	                        </pitch>
+	                        <duration>8</duration>
+	                        <voice>1</voice>
+	                        <type>half</type>
+                        <lyric number="1">
+	                                <syllabic>single</syllabic>
+	                                <text font-family="CenturySchL" font-size="10" font-weight="normal" font-style="normal" xml:lang="en">Bleb</text>
+	                        </lyric>
+	                </note>
+	     </measure>
+	  </part>
+	</score-partwise>

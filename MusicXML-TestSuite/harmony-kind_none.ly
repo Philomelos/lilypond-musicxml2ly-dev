@@ -1,5 +1,4 @@
-
-\version "2.15.24"
+\version "2.17.6"
 % automatically converted by musicxml2ly from harmony-kind_none.xml
 
 \header {
@@ -24,16 +23,12 @@ PartPOneVoiceOneLyricsOne =  \lyricmode { none }
             <<
  \new Staff <<
                     \context Staff << 
-                        \context Voice = "PartPOneVoiceOne" { \PartPOneVoiceOne }
+                        \context Voice = "PartPOneVoiceOne" {  \PartPOneVoiceOne }
                         \new Lyrics \lyricsto "PartPOneVoiceOne" \PartPOneVoiceOneLyricsOne
                         >>
-                    >>
-                >>
-            
-            >>
-        >>
-    \layout {}
+                    >> >>
+            >> >> \layout {}
     % To create MIDI output, uncomment the following line:
-    %  \midi {}
+    %  \midi {\tempo 4 = 100 }
     }
 
