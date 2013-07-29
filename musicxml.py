@@ -1142,6 +1142,10 @@ class Slur (Music_xml_spanner):
     def get_type (self):
         return self.type
 
+class Tied (Music_xml_spanner):
+    def get_type (self):
+        return self.type
+
 class Beam (Music_xml_spanner):
     def get_type (self):
         return self.get_text ()
@@ -1362,6 +1366,7 @@ class_dict = {
         'syllabic': Syllabic,
         'text': Text,
         'time-modification': Time_modification,
+        'tied': Tied,
         'tuplet': Tuplet,
         'type': Type,
         'unpitched': Unpitched,

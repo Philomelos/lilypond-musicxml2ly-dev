@@ -117,12 +117,13 @@ def extract_paper_information (tree):
         set_paper_variable ("page_height", pagelayout, 'page-height')
         set_paper_variable ("page_width", pagelayout, 'page-width')
 
-        pmargins = pagelayout.get_named_children ('page-margins')
-        for pm in pmargins:
-            set_paper_variable ("left_margin", pm, 'left-margin')
-            set_paper_variable ("right_margin", pm, 'right-margin')
-            set_paper_variable ("bottom_margin", pm, 'bottom-margin')
-            set_paper_variable ("top_margin", pm, 'top-margin')
+        if conversion_settings.convert_page_margins:
+            pmargins = pagelayout.get_named_children ('page-margins')
+            for pm in pmargins:
+                set_paper_variable ("left_margin", pm, 'left-margin')
+                set_paper_variable ("right_margin", pm, 'right-margin')
+                set_paper_variable ("bottom_margin", pm, 'bottom-margin')
+                set_paper_variable ("top_margin", pm, 'top-margin')
 
     systemlayout = defaults.get_maybe_exist_named_child ('system-layout')
     if systemlayout:
@@ -955,11 +956,11 @@ def musicxml_print_to_lily (el):
     #      page-number CDATA #IMPLIED
     #  >
     elts = []
-    if (hasattr (el, "new-system") and conversion_settings.convert_page_layout):
+    if (hasattr (el, "new-system") and conversion_settings.convert_system_breaks):
         val = getattr (el, "new-system")
         if (val == "yes"):
             elts.append (musicexp.Break ("break"))
-    if (hasattr (el, "new-page") and conversion_settings.convert_page_layout):
+    if (hasattr (el, "new-page") and conversion_settings.convert_page_breaks):
         val = getattr (el, "new-page")
         if (val == "yes"):
             elts.append (musicexp.Break ("pageBreak"))
@@ -1986,7 +1987,7 @@ def musicxml_note_to_lily_main_event (n):
                 event.add_associated_event (v)
     return event
 
-def musicxml_lyrics_to_text (lyrics, beamed, in_slur):
+def musicxml_lyrics_to_text (lyrics, ignoremelismata):
     # TODO: Implement text styles for lyrics syllables
     continued = False
     extended = False
@@ -2009,24 +2010,27 @@ def musicxml_lyrics_to_text (lyrics, beamed, in_slur):
             extended = True
 
     if text == "-" and continued:
-        return " -- "
+        return "--"
     elif text == "_" and extended:
-        return " __ "
+        return "__"
     elif continued and text:
-        if (beamed == "begin" or in_slur == "start"):
-            return musicxml.escape_ly_output_string (text) + "-_"
-        elif beamed == "end":
-            return musicxml.escape_ly_output_string (text) + "- -- "
+        if options.convert_beaming:
+            if (ignoremelismata == "on"):
+                return " \set ignoreMelismata = ##t " + musicxml.escape_ly_output_string (text)
+            elif (ignoremelismata == "off"):
+                return " " + musicxml.escape_ly_output_string (text) + " -- \unset ignoreMelismata"
+            else:
+                return " " + musicxml.escape_ly_output_string (text) + " --"
         else:
-            return musicxml.escape_ly_output_string (text) + " -- "
+            return " " + musicxml.escape_ly_output_string (text) + " -- "
     elif continued:
         return "--"
     elif extended and text:
-        return musicxml.escape_ly_output_string (text) + "__"
+        return " " + musicxml.escape_ly_output_string (text) + " __"
     elif extended:
         return "__"
     elif text:
-        return musicxml.escape_ly_output_string (text) + " "
+        return " " + musicxml.escape_ly_output_string (text)
     else:
         return ""
 
@@ -2239,8 +2243,9 @@ def musicxml_voice_to_lily_voice (voice):
     fretboards_builder = LilyPondVoiceBuilder ()
     current_measure_length = Rational (4, 4)
     voice_builder.set_measure_length (current_measure_length)
+    in_slur = False
 
-    for n in voice._elements:
+    for idx, n in enumerate(voice._elements):
         tie_started = False
         if n.get_name () == 'forward':
             continue
@@ -2602,29 +2607,49 @@ def musicxml_voice_to_lily_voice (voice):
                     is_beamed = False
 
         # Extract the lyrics
-        if not rest and not ignore_lyrics:
+        if not (rest or ignore_lyrics):
             note_lyrics_processed = []
             note_lyrics_elements = n.get_typed_children (musicxml.Lyric)
             beamed = n.get_named_children('beam')
             if ( len(beamed) != 0):
                 beamed = beamed[0].get_text ()
-            in_slur = None
+            else:
+                beamed = None
+            slurred = None
+            tied = None
             if ( n.get_maybe_exist_named_child ('notations') != None):
-                in_slur = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
-                if ( in_slur != None):
-                    in_slur = in_slur.get_type ()
+                slurred = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
+                if ( slurred != None):
+                    slurred = slurred.get_type ()
+                    if (slurred == "start" or slurred == "continue"):
+                        in_slur == True
+                tied = n.get_named_child ('notations').get_maybe_exist_named_child ('tied')
+                if ( tied != None):
+                    tied = tied.get_type ()
+
+            if (beamed == "begin" or slurred == "start") and (len(voice._elements[idx+1].get_typed_children (musicxml.Lyric)) != 0):
+                ignoremelismata = "on"
+            elif (beamed == "end" or slurred == "stop") and (len(note_lyrics_elements) != 0):
+                ignoremelismata = "off"
+            else:
+                ignoremelismata = None
 
             for l in note_lyrics_elements:
-                if l.get_number () < 0:
-                    for k in lyrics.keys ():
-                        lyrics[k].append (musicxml_lyrics_to_text (l, beamed, in_slur))
-                        note_lyrics_processed.append (k)
-                else:
-                    lyrics[l.number].append(musicxml_lyrics_to_text (l, beamed, in_slur))
-                    note_lyrics_processed.append (l.number)
+                if not(hasattr(n, "print-lyric") and getattr(n, "print-lyric") == "no"):
+                    if l.get_number () < 0:
+                        for k in lyrics.keys ():
+                            lyrics[k].append (musicxml_lyrics_to_text (l, ignoremelismata))
+                            note_lyrics_processed.append (k)
+                    else:
+                        lyrics[l.number].append(musicxml_lyrics_to_text (l, ignoremelismata))
+                        note_lyrics_processed.append (l.number)
+
             for lnr in lyrics.keys ():
-                if not lnr in note_lyrics_processed:
+                if not ((lnr in note_lyrics_processed) or (ignoremelismata == None and (beamed == None or not(in_slur) or tied == None))):
                     lyrics[lnr].append ("\skip4")
+
+            if (slurred == "stop"):
+                in_slur = False
 
         # Assume that a <tie> element only lasts for one note.
         # This might not be correct MusicXML interpretation, but works for
@@ -2886,11 +2911,29 @@ information.""") % 'lilypond')
                   dest="convert_rest_positions",
                   help=_ ("do not convert exact vertical positions of rests"))
 
+    p.add_option ('--nsb', '--no-system-breaks',
+                  action="store_false",
+                  default=True,
+                  dest="convert_system_breaks",
+                  help=_ ("ignore system breaks"))
+
+    p.add_option ('--npb', '--no-page-breaks',
+                  action="store_false",
+                  default=True,
+                  dest="convert_page_breaks",
+                  help=_ ("ignore page breaks"))
+
+    p.add_option ('--npm', '--no-page-margins',
+                  action="store_false",
+                  default=True,
+                  dest="convert_page_margins",
+                  help=_ ("ignore page margins"))
+
     p.add_option ('--npl', '--no-page-layout',
                   action="store_false",
                   default=True,
                   dest="convert_page_layout",
-                  help=_ ("do not convert the exact page layout and breaks"))
+                  help=_ ("do not convert the exact page layout and breaks (shortcut for \"--nsb --npb --npm\" options)"))
 
     p.add_option ('--nsd', '--no-stem-directions',
                   action="store_false",
@@ -3206,7 +3249,6 @@ def convert (filename, options):
       output_ly_name = 'Standard output'
     else:
       output_ly_name = options.output_name + '.ly'
-
     ly.progress (_ ("Output to `%s'") % output_ly_name, True)
     printer = musicexp.Output_printer()
     #ly.progress (_ ("Output to `%s'") % defs_ly_name, True)
@@ -3234,7 +3276,7 @@ def convert (filename, options):
     if (options.output_name != "-"):
         version = os.popen("lilypond --version | head -1 | cut -d' ' -f3").read().strip()
         ly.progress (_ ("Converting to current version (%s) notations ..." % version), True)
-        os.system("convert-ly -e %s 2> /dev/null" % output_ly_name)
+        os.system("convert-ly -e %s 2> /dev/null" % musicxml.escape_ly_output_string (output_ly_name))
 
     return voices
 
@@ -3281,6 +3323,14 @@ def main ():
 
     conversion_settings.ignore_beaming = not options.convert_beaming
     conversion_settings.convert_page_layout = options.convert_page_layout
+    if conversion_settings.convert_page_layout:
+        conversion_settings.convert_system_breaks = options.convert_system_breaks
+        conversion_settings.convert_page_breaks = options.convert_page_breaks
+        conversion_settings.convert_page_margins = options.convert_page_margins
+    else:
+        conversion_settings.convert_system_breaks = False
+        conversion_settings.convert_page_breaks = False
+        conversion_settings.convert_page_margins = False
     conversion_settings.convert_stem_directions = options.convert_stem_directions
 
     # Allow the user to leave out the .xml or xml on the filename
