@@ -11,8 +11,14 @@
         autoBeaming = ##f
         }
     }
-PartPOneVoiceOne =  \relative c'' {
-    \clef "treble" \key c \major \numericTimeSignature\time 4/4 <c a>1 }
+PartPOneVoiceOne =  \relative f' {
+    \clef "treble" \key c \major \numericTimeSignature\time 4/4 s1 | % 2
+    s1*1/35 \stemUp f4*4/105 }
+
+PartPOneVoiceOneLyricsOne =  \lyricmode { And }
+PartPOneVoiceNone =  \relative c' {
+    \clef "treble" \key c \major \numericTimeSignature\time 4/4 s1 | % 2
+    r2.*4/105 }
 
 
 % The score definition
@@ -21,8 +27,10 @@ PartPOneVoiceOne =  \relative c'' {
  <<
             <<
  \new Staff <<
-                    \context Staff << 
-                        \context Voice = "PartPOneVoiceOne" {  \PartPOneVoiceOne }
+                    \context Staff = "1" << 
+                        \context Voice = "PartPOneVoiceOne" {  \voiceOne \PartPOneVoiceOne }
+                        \new Lyrics \lyricsto "PartPOneVoiceOne" \PartPOneVoiceOneLyricsOne
+                        \context Voice = "PartPOneVoiceNone" {  \voiceTwo \PartPOneVoiceNone }
                         >>
                     >> >>
             >> >> \layout {}

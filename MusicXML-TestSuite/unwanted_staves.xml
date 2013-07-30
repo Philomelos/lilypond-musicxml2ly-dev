@@ -33,6 +33,7 @@
                     <line>2</line>
                 </clef>
             </attributes>
+<!--            
             <note>
                 <pitch>
                     <step>C</step>
@@ -50,10 +51,53 @@
                     <octave>4</octave>
                 </pitch>
                 <duration>26880</duration>
+-->
                 <!--<voice>1</voice>-->
+<!--                
                 <type>whole</type>
                 <staff>1</staff>
             </note>
+-->
         </measure>
+        <measure number="2" width="314">
+                
+<!--                
+   <print new-page="yes">
+    <system-layout>
+     <system-margins>
+      <left-margin>113</left-margin>
+      <right-margin>0</right-margin>
+     </system-margins>
+     <top-system-distance>358</top-system-distance>
+    </system-layout>
+   </print>
+-->
+   <attributes>
+    <staff-details number="1" print-object="yes" />
+   </attributes>
+   <note default-x="57">
+    <rest />
+    <duration>768</duration>
+<!--    <voice>1</voice>-->
+    <type>half</type>
+    <dot />
+   <staff>1</staff>
+   </note>
+   <note>
+    <pitch>
+     <step>F</step>
+     <octave>4</octave>
+    </pitch>
+    <duration>256</duration>
+    <voice>1</voice>
+    <type>quarter</type>
+    <stem>up</stem>
+    <staff>1</staff>
+    <lyric default-y="-80" number="1">
+     <syllabic>single</syllabic>
+     <text>And</text>
+    </lyric>
+   </note>
+  </measure>
     </part>
 </score-partwise>

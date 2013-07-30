@@ -6,7 +6,7 @@
 <identification>
 <miscellaneous>
 <miscellaneous-field name="description">8 note elements: a blue
-quarter note (G4), 2 red eighth notes (A4, B4), an uncolored
+quarter note (G4), a transparent purple eighth note (A4), a red eighth notes (B4), an uncolored
 half rest, a green quarter note (C5), an uncolored quarter
 note (D5), a staccato cyan quarter note (E5), and a magenta
 'x' notehead quarter note (F5).
@@ -36,7 +36,7 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <line>2</line>
 </clef>
 </attributes>
-<note color="#80080">
+<note>
 <pitch>
 <step>G</step>
 <octave>4</octave>
@@ -44,8 +44,10 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>2</duration>
 <voice>1</voice>
 <type>quarter</type>
+<stem color="#7384DB">up</stem>
+<notehead color="#7384DB">normal</notehead>
 </note>
-<note color="#40800080">
+<note>
 <pitch>
 <step>A</step>
 <octave>4</octave>
@@ -53,9 +55,11 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>1</duration>
 <voice>1</voice>
 <type>eighth</type>
+<stem color="#40800080">up</stem>
+<notehead color="#40800080">normal</notehead>
 <beam number="1">begin</beam>
 </note>
-<note color="#FF0000">
+<note>
 <pitch>
 <step>B</step>
 <octave>4</octave>
@@ -63,6 +67,8 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>1</duration>
 <voice>1</voice>
 <type>eighth</type>
+<stem color="#FF0000">up</stem>
+<notehead color="#FF0000">normal</notehead>
 <beam number="1">end</beam>
 </note>
 <note>
@@ -74,7 +80,7 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 </measure>
 <!--=======================================================-->
 <measure number="2">
-<note color="#00FF00">
+<note>
 <pitch>
 <step>C</step>
 <octave>5</octave>
@@ -82,6 +88,8 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>2</duration>
 <voice>1</voice>
 <type>quarter</type>
+<stem color="#00FF00">up</stem>
+<notehead color="#00FF00">normal</notehead>
 </note>
 <note>
 <pitch>
@@ -92,7 +100,7 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <voice>1</voice>
 <type>quarter</type>
 </note>
-<note color="#00FFFF">
+<note>
 <pitch>
 <step>E</step>
 <octave>5</octave>
@@ -100,13 +108,15 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>2</duration>
 <voice>1</voice>
 <type>quarter</type>
+<stem color="#00FFFF">up</stem>
+<notehead color="#00FFFF">normal</notehead>
 <notations>
 <articulations>
 <staccato placement="above"/>
 </articulations>
 </notations>
 </note>
-<note color="#FF00FF">
+<note>
 <pitch>
 <step>F</step>
 <octave>5</octave>
@@ -114,7 +124,8 @@ note (D5), a staccato cyan quarter note (E5), and a magenta
 <duration>2</duration>
 <voice>1</voice>
 <type>quarter</type>
-<notehead>x</notehead>
+<stem color="#FF00FF">up</stem>
+<notehead color="#FF00FF">x</notehead>
 </note>
 <barline location="right">
 <bar-style>light-heavy</bar-style>

@@ -1430,21 +1430,38 @@ class StemEvent (Event):
     def ly_expression (self):
         return self.pre_chord_ly ()
 
-class NotestyleEvent (Event):
+class NotestyleEvent (Event): #class changed by DaLa: additional attribute color
     def __init__ (self):
         Event.__init__ (self)
         self.style = None
         self.filled = None
+        self.color = None
     def pre_chord_ly (self):
+        return_string = '' 
         if self.style:
-            return "\\once \\override NoteHead #'style = #%s" % self.style
-        else:
-            return ''
+            return_string += " \\once \\override NoteHead #'style = #%s" % self.style
+        if self.color:
+            return_string += " \\once \\override NoteHead #'color = #(rgb-color %s %s %s)" % (self.color[0], self.color[1], self.color[2])
+        return return_string
     def pre_note_ly (self, is_chord_element):
         if self.style and is_chord_element:
             return "\\tweak #'style #%s" % self.style
         else:
             return ''
+    def ly_expression (self):
+        return self.pre_chord_ly ()
+
+class StemstyleEvent (Event): #class added by DaLa
+    def __init__ (self):
+        Event.__init__ (self)
+        self.color = None
+    def pre_chord_ly (self):
+        if self.color:
+            return "\\once \\override Stem #'color = #(rgb-color %s %s %s)" % (self.color[0], self.color[1], self.color[2])
+        else:
+            return ''
+    def pre_note_ly (self, is_chord_element):
+        return ''
     def ly_expression (self):
         return self.pre_chord_ly ()
 

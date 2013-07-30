@@ -1638,7 +1638,7 @@ notehead_styles_dict = {
     'ti': '\'ti',
     }
 
-def musicxml_notehead_to_lily (nh):
+def musicxml_notehead_to_lily (nh): #function changed: additionally processcolor attribute
     styles = []
 
     # Notehead style
@@ -1648,7 +1648,10 @@ def musicxml_notehead_to_lily (nh):
         style_elm.style = style
     if hasattr (nh, 'filled'):
         style_elm.filled = (getattr (nh, 'filled') == "yes")
-    if style_elm.style or (style_elm.filled != None):
+    if hasattr (nh, 'color'):
+        style_elm.color = hex_to_color (getattr (nh, 'color'))
+    if style_elm.style or (style_elm.filled != None) or (style_elm.color !=
+None):
         styles.append (style_elm)
 
     # parentheses
@@ -1657,6 +1660,17 @@ def musicxml_notehead_to_lily (nh):
 
     return styles
 
+def musicxml_stem_to_lily (st): #function added: process stem color attribute
+      styles = []
+      # Stem style
+      style_elm = musicexp.StemstyleEvent ()
+      if hasattr (st, 'color'):
+            style_elm.color = hex_to_color (getattr (st, 'color'))
+      if (style_elm.color != None):
+            styles.append (style_elm)
+      return styles
+
+      
 stem_value_dict = {
     'down': 'stemDown',
     'up': 'stemUp',
