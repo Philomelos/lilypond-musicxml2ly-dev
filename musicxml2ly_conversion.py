@@ -785,7 +785,7 @@ def musicxml_clef_to_lily (attributes):
 def musicxml_time_to_lily (attributes):
     change = musicexp.TimeSignatureChange()
     # time signature function
-    if options.shift_meter:
+    if hasattr(options, 'shift_meter') and options.shift_meter:
 	tmp_meter = options.shift_meter.split("/",1)
 	sig = [int(tmp_meter[0]), int(tmp_meter[1])]
 	change.originalFractions = attributes.get_time_signature ()
@@ -1288,9 +1288,9 @@ def musicxml_articulation_to_lily_event (mxl_event):
 
     # Some articulations use the type attribute, other the placement...
     dir = None
-    if hasattr (mxl_event, 'type') and options.convert_directions:
+    if hasattr (mxl_event, 'type') and hasattr(options, 'convert_directions') and options.convert_directions:
         dir = musicxml_direction_to_indicator (mxl_event.type)
-    if hasattr (mxl_event, 'placement') and options.convert_directions:
+    if hasattr (mxl_event, 'placement') and hasattr(options, 'convert_directions') and options.convert_directions:
         dir = musicxml_direction_to_indicator (mxl_event.placement)
     if dir:
         ev.force_direction = dir
@@ -1963,7 +1963,7 @@ def musicxml_note_to_lily_main_event (n):
         # treated like an ordinary note pitch
         rest = n.get_maybe_exist_typed_child (musicxml.Rest)
         event = musicexp.RestEvent ()
-        if options.convert_rest_positions:
+        if hasattr(options, 'convert_rest_positions') and options.convert_rest_positions:
             pitch = musicxml_restdisplay_to_lily (rest)
             event.pitch = pitch
 
@@ -2026,7 +2026,7 @@ def musicxml_lyrics_to_text (lyrics, ignoremelismata):
     elif text == "_" and extended:
         return "__"
     elif continued and text:
-        if options.convert_beaming:
+        if hasattr(options, 'convert_beaming') and options.convert_beaming:
             if (ignoremelismata == "on"):
                 return " \set ignoreMelismata = ##t " + musicxml.escape_ly_output_string (text)
             elif (ignoremelismata == "off"):
@@ -2671,7 +2671,7 @@ def musicxml_voice_to_lily_voice (voice):
 
     ## force trailing mm rests to be written out.
     voice_builder.add_music (musicexp.ChordEvent (), Rational (0))
-    if options.shift_meter:
+    if hasattr(options, 'shift_meter') and options.shift_meter:
 	for event in voice_builder.elements:
 	    if isinstance(event, musicexp.TimeSignatureChange):
 		sd = []
@@ -2699,13 +2699,12 @@ def musicxml_voice_to_lily_voice (voice):
     if len (modes_found) > 1:
        ly.warning (_ ('cannot simultaneously have more than one mode: %s') % modes_found.keys ())
 
-
-    if options.shift_meter:
+    if hasattr(options, 'shift_meter') and options.shift_meter:
         sd[-1].element = seq_music
         seq_music = sd[-1]
         sd.pop()
 
-    if options.relative:
+    if hasattr(options, 'relative') and options.relative:
         v = musicexp.RelativeMusic ()
         v.element = seq_music
         v.basepitch = first_pitch
@@ -2725,7 +2724,7 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'figuremode'
         v.element = fbass_music
-	if options.shift_meter:
+	if hasattr(options, 'shift_meter') and options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -2738,7 +2737,7 @@ def musicxml_voice_to_lily_voice (voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'chordmode'
         v.element = cname_music
-	if options.shift_meter:
+	if hasattr(options, 'shift_meter') and options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -2750,7 +2749,7 @@ def musicxml_voice_to_lily_voice (voice):
         fboard_music.elements = group_repeats (fretboards_builder.elements)
         v = musicexp.MusicWrapper()
         v.element = fboard_music
-	if options.shift_meter:
+	if hasattr(options, 'shift_meter') and options.shift_meter:
 	    sd[-1].element = v
 	    v = sd[-1]
 	    sd.pop()
@@ -3154,7 +3153,7 @@ def print_ly_preamble (printer, filename):
     printer.dump_version ()
     printer.print_verbatim ('%% automatically converted by musicxml2ly from %s\n' % filename)
 
-def print_ly_additional_definitions (printer, filename):
+def print_ly_additional_definitions (printer, filename=None):
     if needed_additional_definitions:
         printer.newline ()
         printer.print_verbatim ('%% additional definitions required by the score:')
