@@ -36,7 +36,7 @@ class Output_stack_element:
         o.factor = self.factor
         return o
 
-class Output_printer:
+class Output_printer(object):
     """
     A class that takes care of formatting (eg.: indenting) a
     Music expression as a .ly file.
