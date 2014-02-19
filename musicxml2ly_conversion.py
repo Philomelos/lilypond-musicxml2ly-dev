@@ -1100,14 +1100,29 @@ def musicxml_direction_to_indicator (direction):
     return { "above": 1, "upright": 1, "up": 1, "below":-1, "downright":-1, "down":-1, "inverted":-1 }.get (direction, 0)
 
 def musicxml_fermata_to_lily_event (mxl_event):
+
     ev = musicexp.ArticulationEvent ()
     txt = mxl_event.get_text ()
+
     # The contents of the element defined the shape, possible are normal, angled and square
     ev.type = { "angled": "shortfermata", "square": "longfermata" }.get (txt, "fermata")
+    fermata_types= { "angled": "shortfermata",
+                     "square": "longfermata" }
+
+    # MusicXML fermata types can be specified in two different ways: 
+    # 1. <fermata>angled</fermata> and
+    # 2. <fermata type="angled"/> -- both need to be handled.
+    if hasattr(mxl_event, 'type'):
+        fermata_type = fermata_types.get(mxl_event.type, 'fermata')
+    else:
+        fermata_type = fermata_types.get(mxl_event.get_text(), 'fermata')
+
+    ev.type = fermata_type
+
     if hasattr (mxl_event, 'type'):
-      dir = musicxml_direction_to_indicator (mxl_event.type)
-      if dir and options.convert_directions:
-        ev.force_direction = dir
+        dir = musicxml_direction_to_indicator (mxl_event.type)
+        if dir and options.convert_directions:
+            ev.force_direction = dir
     return ev
 
 def musicxml_arpeggiate_to_lily_event (mxl_event):
