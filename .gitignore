@@ -1,3 +1,5 @@
 *.pyc
-MusicXML-TestSuite/
+*.xml
+*.ly
+*.ly~
 
