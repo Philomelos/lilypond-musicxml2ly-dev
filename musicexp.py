@@ -1318,9 +1318,21 @@ class ShortArticulationEvent (ArticulationEvent):
             return ''
 
 class NoDirectionArticulationEvent (ArticulationEvent):
+
+    def is_breathing_sign(self):
+        return self.type == 'breathe'
+
+    def print_after_note(self, printer):
+        # The breathing sign should, according to current LilyPond
+        # praxis, be treated as an independent musical
+        # event. Consequently, it should be printed _after_ the note
+        # to which it is attached.
+        if self.is_breathing_sign():
+            printer.dump(r'\breathe')
+
     def ly_expression (self):
-        if self.type:
-            return '\\%s' % self.type
+        if self.type and not self.is_breathing_sign():
+             return '\\%s' % self.type
         else:
             return ''
 
