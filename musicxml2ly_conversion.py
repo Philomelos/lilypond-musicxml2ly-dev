@@ -1673,15 +1673,15 @@ None):
 
     return styles
 
-def musicxml_stem_to_lily (st): #function added: process stem color attribute
-      styles = []
-      # Stem style
-      style_elm = musicexp.StemstyleEvent ()
-      if hasattr (st, 'color'):
-            style_elm.color = hex_to_color (getattr (st, 'color'))
-      if (style_elm.color != None):
-            styles.append (style_elm)
-      return styles
+def musicxml_stem_to_stem_style_event (st): #function added: process stem color attribute
+    styles = []
+    # Stem style
+    style_elm = musicexp.StemstyleEvent ()
+    if hasattr (st, 'color'):
+        style_elm.color = hex_to_color (getattr (st, 'color'))
+    if (style_elm.color != None):
+        styles.append (style_elm)
+    return styles
 
       
 stem_value_dict = {
@@ -2006,13 +2006,24 @@ def musicxml_note_to_lily_main_event (n):
         for s in styles:
             event.add_associated_event (s)
 
+    # set stem directions 
     if conversion_settings.convert_stem_directions:
         stems = n.get_named_children ('stem')
         for svs in stems:
             values = musicxml_stemvalue_to_lily (svs)
             for v in values:
                 event.add_associated_event (v)
+
+    # set stem style
+    stems = n.get_named_children ('stem')
+    for stem in stems:
+        styles = musicxml_stem_to_stem_style_event(stem)
+        for style in styles:
+            event.add_associated_event (style)
+
     return event
+
+
 
 def musicxml_lyrics_to_text (lyrics, ignoremelismata):
     # TODO: Implement text styles for lyrics syllables
