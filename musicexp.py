@@ -803,20 +803,39 @@ class Lyrics:
         lstr += "\n}"
         return lstr
 
-
 class Header:
+
     def __init__ (self):
         self.header_fields = {}
+
     def set_field (self, field, value):
         self.header_fields[field] = value
+
+    def format_header_strings(self, key, value, printer):
+        printer.dump(key + ' = ')
+
+        # If a header item contains a line break, it is segmented. The
+        # substrings are formatted with the help of \markup, using
+        # \column and \line.
+        if '\n' in value: 
+            value = value.replace('"', '')
+            printer.dump(r'\markup \column {')
+            substrings = value.split('\n')
+            for s in substrings:
+                printer.newline()
+                printer.dump(r'\line { "' + s + '"}')
+            printer.dump('}')
+            printer.newline()
+        else:
+            printer.newline()
+            printer.dump(value)
 
     def print_ly (self, printer):
         printer.dump ("\header {")
         printer.newline ()
         for (k, v) in self.header_fields.items ():
             if v:
-                printer.dump ('%s = %s' % (k, v))
-                printer.newline ()
+               self.format_header_strings(k, v, printer)
         printer.dump ("}")
         printer.newline ()
         printer.newline ()
