@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     meiversion="2013">
+   <meiHead>
+      <fileDesc>
+         <titleStmt>
+            <title/>
+         </titleStmt>
+         <pubStmt>
+            <availability>
+               <useRestrict>No rights specified in MusicXML source file</useRestrict>
+            </availability>
+         </pubStmt>
+         <sourceDesc>
+            <source>
+               <titleStmt>
+                  <title/>
+               </titleStmt>
+               <pubStmt/>
+               <notesStmt>
+                  <annot label="description">Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a half. Once in the lower and once in the upper region of the staff.</annot>
+               </notesStmt>
+            </source>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <editorialDecl>
+            <normalization>
+               <p>Calculation of @tstamp and @tstamp2 values on control events, such as dir, dynam,
+              hairpin, etc., includes MusicXML offset values.</p>
+               <p>The parameters for musicxml2mei.xsl were set as follows: <list>
+                     <li>accidStyle: "attr", </li>
+                     <li>articStyle: "elem", </li>
+                     <li>formeWork: "strip", </li>
+                     <li>generateMIDI: "false", </li>
+                     <li>keepAttributes: "false", </li>
+                     <li>keepRights: "true", </li>
+                     <li>labelStyle: "attr", </li>
+                     <li>layout: "strip", </li>
+                     <li>tieStyle: "attr"</li>
+                  </list>
+               </p>
+            </normalization>
+         </editorialDecl>
+      </encodingDesc>
+      <revisionDesc>
+         <change n="1">
+            <respStmt/>
+            <changeDesc>
+               <p>Transcoded from a MusicXML version 1.0 file using an XSLT stylesheet (musicxml2mei v. 3.0).</p>
+            </changeDesc>
+            <date>2013-11-21</date>
+         </change>
+      </revisionDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="4"
+                         meter.unit="4"
+                         meter.sym="common"
+                         key.sig="0"
+                         key.mode="major">
+                  <staffGrp>
+                     <staffDef n="1"
+                               xml:id="P1"
+                               label="MusicXML Part"
+                               lines="5"
+                               clef.line="2"
+                               clef.shape="G"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1" xml:id="d2e10">
+                     <staff n="1">
+                        <layer n="1">
+                           <note xml:id="d2e30" pname="c" oct="4" dur="4" accid.ges="fd"/>
+                           <note xml:id="d2e44" pname="d" oct="4" dur="4" accid.ges="fu"/>
+                           <note xml:id="d2e58" pname="e" oct="4" dur="4" accid.ges="sd"/>
+                           <note xml:id="d2e72" pname="f" oct="4" dur="4" accid.ges="su"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="2" xml:id="d2e86" right="end">
+                     <staff n="1">
+                        <layer n="1">
+                           <note xml:id="d2e88" pname="c" oct="5" dur="4" accid.ges="fd"/>
+                           <note xml:id="d2e102" pname="d" oct="5" dur="4" accid.ges="fu"/>
+                           <note xml:id="d2e116" pname="e" oct="5" dur="4" accid.ges="sd"/>
+                           <note xml:id="d2e130" pname="f" oct="5" dur="4" accid.ges="su"/>
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

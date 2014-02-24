@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">
+                musicxml2ly places expressive marks such as breath marks, 
+                dynamics, fermatas... within manual beam brackets which 
+                all cause fatal errors during compilation.
+                Temporary workaround: use musicxml2ly command line option 
+                --nb or --no-beaming.
+            </miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="1"/>
+    </part-list>
+    <part id="1">
+        <measure>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>2</duration>
+                <beam>begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>2</duration>
+                <beam>end</beam>
+                <notations>
+                    <!--
+                    <dynamics>
+                        <p/>
+                    </dynamics>
+                    -->
+                    <!--
+                    <fermata/>
+                    -->
+                    <!--
+                    <arpeggiate/>
+                    -->
+                    <articulations>
+                        <breath-mark/>
+                    </articulations>
+                </notations>
+            </note>
+        </measure>
+    </part>
+</score-partwise>

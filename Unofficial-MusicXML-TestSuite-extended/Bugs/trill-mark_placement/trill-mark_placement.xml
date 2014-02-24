@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+"http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+<movement-title>trill-marks and segmentation faults</movement-title>
+<identification>
+<miscellaneous>
+<miscellaneous-field name="description">sometimes seqmentation faults occur when a trill-mark is placed above a staff instead of below.
+</miscellaneous-field>
+</miscellaneous>
+</identification>
+<part-list>
+<score-part id="P1">
+<part-name></part-name>
+</score-part>
+</part-list>
+<!--=========================================================-->
+<part id="P1">
+		<measure number="1">
+			<attributes>
+				<divisions>480</divisions>
+				<key>
+					<fifths>0</fifths>
+					<mode>major</mode>
+				</key>
+				<time symbol="common">
+					<beats>4</beats>
+					<beat-type>4</beat-type>
+				</time>
+				<clef>
+					<sign>G</sign>
+					<line>2</line>
+				</clef>
+			</attributes>
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>half</type>
+				<notations>
+					<slur number="1" placement="above" type="start"/>
+					<ornaments>
+						<trill-mark relative-x="5" default-y="0" placement="above"/>
+					</ornaments>
+				</notations>
+			</note>
+			<note>
+				<grace slash="no"/>
+				<pitch>
+					<step>B</step>
+					<octave>4</octave>
+				</pitch>
+				<voice>1</voice>
+				<type>eighth</type>
+				<stem>up</stem>
+				<beam number="1">begin</beam>
+			</note>
+			<note>
+				<grace slash="no"/>
+				<pitch>
+					<step>C</step>
+					<octave>5</octave>
+				</pitch>
+				<voice>1</voice>
+				<type>eighth</type>
+				<stem>up</stem>
+				<beam number="1">end</beam>
+				<notations>
+					<slur number="1" type="stop"/>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>E</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>480</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+			</note>
+			<note>
+				<pitch>
+					<step>D</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>360</duration>
+				<voice>1</voice>
+				<type>eighth</type>
+				<dot/>
+				<beam number="1">begin</beam>
+				<notations>
+					<articulations>
+						<staccato/>
+						<tenuto/>
+					</articulations>
+					<slur number="1" placement="above" type="start"/>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>E</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>120</duration>
+				<voice>1</voice>
+				<type>16th</type>
+				<beam number="1">end</beam>
+				<notations>
+					<articulations>
+						<staccato/>
+					</articulations>
+					<slur number="1" type="stop"/>
+				</notations>
+			</note>
+<!--
+			<barline location="right">
+				<ending type="start" number="1"/>
+			</barline>
+-->
+		</measure>
+
+		<measure number="2">
+			<note>
+				<pitch>
+					<step>C</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>960</duration>
+				<voice>1</voice>
+				<type>half</type>
+				<notations>
+					<slur number="1" placement="above" type="start"/>
+					<ornaments>
+<!--
+						<trill-mark relative-x="7" default-y="0" placement="below"/>
+-->
+
+						<trill-mark relative-x="7" default-y="0" placement="above"/>
+<!--
+causes segmentation fault: 11
+-->
+					</ornaments>
+				</notations>
+			</note>
+			<note>
+				<grace slash="no"/>
+				<pitch>
+					<step>B</step>
+					<octave>4</octave>
+				</pitch>
+				<voice>1</voice>
+				<type>eighth</type>
+				<stem>up</stem>
+				<beam number="1">begin</beam>
+			</note>
+			<note>
+				<grace slash="no"/>
+				<pitch>
+					<step>C</step>
+					<octave>5</octave>
+				</pitch>
+				<voice>1</voice>
+				<type>eighth</type>
+				<stem>up</stem>
+				<beam number="1">end</beam>
+				<notations>
+					<slur number="1" type="stop"/>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>D</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>480</duration>
+				<voice>1</voice>
+				<type>quarter</type>
+			</note>
+			<note>
+				<pitch>
+					<step>G</step>
+					<octave>4</octave>
+				</pitch>
+				<duration>360</duration>
+				<voice>1</voice>
+				<type>eighth</type>
+				<dot/>
+				<beam number="1">begin</beam>
+				<notations>
+					<articulations>
+						<staccato/>
+						<tenuto/>
+					</articulations>
+					<slur number="1" placement="above" type="start"/>
+				</notations>
+			</note>
+			<note>
+				<pitch>
+					<step>D</step>
+					<octave>5</octave>
+				</pitch>
+				<duration>120</duration>
+				<voice>1</voice>
+				<type>16th</type>
+				<beam number="1">end</beam>
+				<notations>
+					<articulations>
+						<staccato/>
+					</articulations>
+					<slur number="1" type="stop"/>
+				</notations>
+			</note>
+		</measure>
+     </part>
+</score-partwise>

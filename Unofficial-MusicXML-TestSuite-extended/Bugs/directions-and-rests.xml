@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+"http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+<movement-title>directions and rests</movement-title>
+<identification>
+<miscellaneous>
+<miscellaneous-field name="description">can directions attached to rests cause segmentation faults?
+</miscellaneous-field>
+</miscellaneous>
+</identification>
+<part-list>
+<score-part id="P1">
+<part-name></part-name>
+</score-part>
+</part-list>
+<!--=========================================================-->
+<part id="P1">
+		<measure number="1">
+			<attributes>
+				<divisions>480</divisions>
+				<key>
+					<fifths>0</fifths>
+					<mode>major</mode>
+				</key>
+				<time symbol="common">
+					<beats>4</beats>
+					<beat-type>4</beat-type>
+				</time>
+				<clef>
+					<sign>G</sign>
+					<line>2</line>
+				</clef>
+			</attributes>
+			<direction placement="below">
+				<direction-type>
+					<dynamics relative-x="-3" default-y="-76" font-size="18">
+						<mf/>
+					</dynamics>
+				</direction-type>
+				<sound dynamics="100"/>
+			</direction>
+			<note>
+				<rest/>
+				<duration>1920</duration>
+				<voice>1</voice>
+				<type>whole</type>
+			</note>
+		</measure>
+     </part>
+</score-partwise>
