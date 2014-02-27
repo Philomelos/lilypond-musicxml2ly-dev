@@ -2114,21 +2114,29 @@ class LilyPondVoiceBuilder:
     def current_duration (self):
         return self.end_moment - self.begin_moment
 
+    def add_pending_dynamics(self):
+        for d in self.pending_dynamics:
+            self.elements.append(d)
+        self.pending_dynamics = []
+
     def add_music (self, music, duration, relevant=True):
         assert isinstance (music, musicexp.Music)
         if self.pending_multibar > Rational (0):
             self._insert_multibar ()
 
         self.has_relevant_elements = self.has_relevant_elements or relevant
-        self.elements.append (music)
+
+        if isinstance(music, musicexp.BarLine):
+            if self.pending_dynamics:
+                self.add_pending_dynamics()
+
+        self.elements.append(music)
         self.begin_moment = self.end_moment
         self.set_duration (duration)
 
         # Insert all pending dynamics right after the note/rest:
         if isinstance (music, musicexp.ChordEvent) and self.pending_dynamics:
-            for d in self.pending_dynamics:
-                music.append (d)
-            self.pending_dynamics = []
+            self.add_pending_dynamics()
 
     # Insert some music command that does not affect the position in the measure
     def add_command (self, command, relevant=True):
