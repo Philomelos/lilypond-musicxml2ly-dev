@@ -6,7 +6,11 @@
   <movement-title>fermatas</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Fermaten</miscellaneous-field>
+      <miscellaneous-field name="description">The fermata text content represents the shape of the
+        fermata sign and may be normal, angled, or square.
+        An empty fermata element represents a normal fermata. [The type attribute can take two values: 
+        upright or inverted]. The fermata type is upright if not specified.
+      </miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -38,7 +42,6 @@
         <type>whole</type>
         <notations>
           <fermata type="upright"/>
-          <fermata>upright</fermata>
         </notations>
         <lyric number="1"><text>upright</text></lyric>
       </note>
@@ -69,7 +72,6 @@
         <voice>1</voice>
         <type>whole</type>
         <notations>
-<!--          <fermata type="angled"/>-->
           <fermata>angled</fermata>
         </notations>
         <lyric number="1"><text>angled</text></lyric>
@@ -85,7 +87,6 @@
         <voice>1</voice>
         <type>whole</type>
         <notations>
-<!--          <fermata type="square"/>-->
           <fermata>square</fermata>
         </notations>
         <lyric number="1"><text>square</text></lyric>
@@ -102,7 +103,6 @@
         <type>whole</type>
         <notations>
           <fermata type="inverted"/>
-          <fermata>inverted</fermata>
         </notations>
         <lyric number="1"><text>inverted</text></lyric>
       </note>
