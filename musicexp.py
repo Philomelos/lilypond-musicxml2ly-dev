@@ -5,6 +5,7 @@ import string
 import re
 import math
 import lilylib as ly
+import warnings
 
 _ = ly._
 
@@ -1119,7 +1120,7 @@ class PedalEvent (SpanEvent):
 
 class TextSpannerEvent (SpanEvent):
     def print_before_note (self, printer):
-        if self.style=="wave":
+        if hasattr(self, 'style') and self.style=="wave":
             printer.dump("\once \override TextSpanner #'style = #'trill")
         try:
             x = {-1:'\\textSpannerDown', 0:'\\textSpannerNeutral', 1: '\\textSpannerUp'}.get(self.force_direction, '')
@@ -1132,13 +1133,14 @@ class TextSpannerEvent (SpanEvent):
 
     def ly_expression (self):
         global whatOrnament
-        if self.style=="ignore": return ""
+        if hasattr(self, 'style') and self.style=="ignore":
+            return ""
         # if self.style=="wave":
         if whatOrnament == "wave":
             return {-1: '\\startTextSpan',
                     1:'\\stopTextSpan'}.get (self.span_direction, '')
         else:
-            if self.style=="stop" and whatOrnament != "trill": return ""
+            if hasattr(self, 'style') and self.style=="stop" and whatOrnament != "trill": return ""
             return {-1: '\\startTrillSpan',
                     1:'\\stopTrillSpan'}.get (self.span_direction, '')
 
@@ -1257,6 +1259,7 @@ class DynamicsEvent (Event):
     def __init__ (self):
         Event.__init__ (self)
         self.type = None
+        self.force_direction = 0
     def wait_for_note (self):
         return True
     def ly_expression (self):

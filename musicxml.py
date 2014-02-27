@@ -6,8 +6,12 @@ import re
 import sys
 import copy
 import lilylib as ly
+import warnings
 
 _ = ly._
+
+import musicexp
+import musicxml2ly_conversion
 
 
 def escape_ly_output_string (input_string):
@@ -117,10 +121,18 @@ class Xml_node:
         cn = self.get_typed_children (klass)
         if len (cn) == 0:
             return None
-        elif len (cn) == 1:
-            return cn[0]
         else:
-            raise "More than 1 child", klass
+            try:
+                assert len(cn) == 1
+                return cn[0]
+            except:
+                msg = ' '.join(
+                    ['more than one child of class ',
+                     klass.__name__,
+                     '...all but the first will be ignored!'])
+                warnings.warn(msg)
+                return cn[0]
+
 
     def get_unique_typed_child (self, klass):
         cn = self.get_typed_children(klass)
