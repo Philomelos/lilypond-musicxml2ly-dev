@@ -1534,16 +1534,14 @@ class ChordNameEvent (Event):
     def add_modification (self, mod):
         self.modifications.append (mod)
     def ly_expression (self):
+
         if not self.root:
             return ''
         value = self.root.ly_expression ()
         if self.duration:
             value += self.duration.ly_expression ()
         if self.kind:
-            value += ":"
-            value += self.kind
-            if self.kind == "1.5":
-                value = "\\powerChords " + value
+            value = self.kind.format(value)
         # First print all additions/changes, and only afterwards all subtractions
         for m in self.modifications:
             if m.type == 1:

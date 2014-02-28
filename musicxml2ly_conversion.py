@@ -1707,37 +1707,37 @@ def musicxml_chordpitch_to_lily (mxl_cpitch):
     return r
 
 chordkind_dict = {
-    'major': '5',
-    'minor': 'm5',
-    'augmented': 'aug5',
-    'diminished': 'dim5',
+    'major': r'{}:5',
+    'minor': r'{}:m5',
+    'augmented': r'{}:aug5',
+    'diminished': r'{}:dim5',
         # Sevenths:
-    'dominant': '7',
-    'dominant-seventh': '7',
-    'major-seventh': 'maj7',
-    'minor-seventh': 'm7',
-    'diminished-seventh': 'dim7',
-    'augmented-seventh': 'aug7',
-    'half-diminished': 'dim5m7',
-    'major-minor': 'maj7m5',
+    'dominant': r'{}:7',
+    'dominant-seventh': r'{}:7',
+    'major-seventh': r'{}:maj7',
+    'minor-seventh': r'{}:m7',
+    'diminished-seventh': r'{}:dim7',
+    'augmented-seventh': r'{}:aug7',
+    'half-diminished': r'{}:dim5m7',
+    'major-minor': r'{}:maj7m5',
         # Sixths:
-    'major-sixth': '6',
-    'minor-sixth': 'm6',
+    'major-sixth': r'{}:6',
+    'minor-sixth': r'{}:m6',
         # Ninths:
-    'dominant-ninth': '9',
-    'major-ninth': 'maj9',
-    'minor-ninth': 'm9',
+    'dominant-ninth': r'{}:9',
+    'major-ninth': r'{}:maj9',
+    'minor-ninth': r'{}:m9',
         # 11ths (usually as the basis for alteration):
-    'dominant-11th': '11',
-    'major-11th': 'maj11',
-    'minor-11th': 'm11',
+    'dominant-11th': r'{}:11',
+    'major-11th': r'{}:maj11',
+    'minor-11th': r'{}:m11',
         # 13ths (usually as the basis for alteration):
-    'dominant-13th': '13.11',
-    'major-13th': 'maj13.11',
-    'minor-13th': 'm13',
+    'dominant-13th': r'{}:13.11',
+    'major-13th': r'{}:maj13.11',
+    'minor-13th': r'{}:m13',
         # Suspended:
-    'suspended-second': 'sus2',
-    'suspended-fourth': 'sus4',
+    'suspended-second': r'{}:sus2',
+    'suspended-fourth': r'{}:sus4',
         # Functional sixths:
     # TODO
     #'Neapolitan': '???',
@@ -1746,9 +1746,9 @@ chordkind_dict = {
     #'German': '???',
         # Other:
     #'pedal': '???',(pedal-point bass)
-    'power': '1.5',
+    'power': r'\powerChords {}:1.5',
     #'Tristan': '???',
-    'other': '1',
+    'other': r'{}:1',
     'none': None,
 }
 
