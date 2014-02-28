@@ -1351,6 +1351,41 @@ def hex_to_color (hex_val):
     else:
         return None
 
+def font_size_number_to_lily_command(size):
+    d = {
+        (0, 8): r'\teeny',
+        (8, 10): r'\tiny',
+        (10, 12): r'\small',
+        (12, 16): r'',
+        (16, 24): r'\large',
+        (24, float('inf')): r'\huge',
+    }
+    result = None
+    for r in d.keys():
+        if r[0] <= size < r[1]:
+            result = d[r]
+            break
+    return result
+
+def font_size_word_to_lily_command(size):
+    font_size_dict = {
+        "xx-small": '\\teeny',
+        "x-small": '\\tiny',
+        "small": '\\small',
+        "medium": '',
+        "large": '\\large',
+        "x-large": '\\huge',
+        "xx-large": '\\larger\\huge'
+        }
+    return font_size_dict.get(size, '')
+
+def get_font_size(size):
+    try:
+        size = float(size)
+        return font_size_number_to_lily_command(size)
+    except ValueError:
+        return font_size_word_to_lily_command(size)
+
 def musicxml_words_to_lily_event (words):
     event = musicexp.TextEvent ()
     text = words.get_text ()
@@ -1376,15 +1411,8 @@ def musicxml_words_to_lily_event (words):
 
     if hasattr (words, 'font-size'):
         size = getattr (words, 'font-size')
-        font_size = {
-            "xx-small": '\\teeny',
-            "x-small": '\\tiny',
-            "small": '\\small',
-            "medium": '',
-            "large": '\\large',
-            "x-large": '\\huge',
-            "xx-large": '\\larger\\huge'
-        }.get (size, '')
+        # font_size = font_size_dict.get (size, '')
+        font_size = get_font_size(size)
         if font_size:
             event.markup += font_size
 
