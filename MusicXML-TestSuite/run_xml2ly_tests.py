@@ -18,7 +18,7 @@ def main():
 
     '''
 
-    now = time.strftime("_%Y_%d_%m_%H_%M_%S")
+    now = time.strftime("_%Y_%m_%d_%H_%M_%S")
     log = open('logs/logfile' + now + '.txt', 'w')
     current_dir = os.path.dirname(os.path.realpath(__file__))
     musicxml2ly_path = os.path.abspath(
