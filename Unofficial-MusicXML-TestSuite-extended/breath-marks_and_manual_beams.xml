@@ -4,23 +4,46 @@
 <score-partwise>
     <identification>
         <miscellaneous>
-            <miscellaneous-field name="description">musicxml2ly places breath 
-                marks within manual beam brackets which causes a fatal 
-                error during compilation. Temporary workaround: use musicxml2ly 
+            <miscellaneous-field name="description">A breath mark is not an expressive
+                mark but a music event of its own.  No expressive marks attached to
+                the preceding note may be placed after it, including closing 
+                square brackets, slurs, etc.  Breath marks within square brackets cause 
+                fatal errors during compilation if breathe is not followed by at least 
+                one note. Temporary workaround: use musicxml2ly 
                 command line option --nb or --no-beaming.</miscellaneous-field>
         </miscellaneous>
     </identification>
     <part-list>
-        <score-part id="1"/>
+        <score-part id="P1">
+            <part-name></part-name>
+        </score-part>
     </part-list>
-    <part id="1">
-        <measure>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>2</divisions>
+                <key>
+                    <fifths>0</fifths>
+                    <mode>major</mode>
+                </key>
+                <time symbol="common">
+                    <beats>4</beats>
+                    <beat-type>4</beat-type>
+                </time>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                </clef>
+            </attributes>
             <note>
                 <pitch>
                     <step>C</step>
                     <octave>4</octave>
                 </pitch>
-                <duration>2</duration>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+                <staff>1</staff>
                 <beam>begin</beam>
             </note>
             <note>
@@ -28,18 +51,30 @@
                     <step>E</step>
                     <octave>4</octave>
                 </pitch>
-                <duration>2</duration>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+                <staff>1</staff>
                 <beam>end</beam>
                 <notations>
                     <articulations>
-                        <!--
                         <breath-mark/>
-                        -->
-                        <dynamics>
-                            <p/>
-                        </dynamics>
                     </articulations>
+                    <dynamics>
+                        <p/>
+                    </dynamics>
                 </notations>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+                <staff>1</staff>
+                <beam>begin</beam>
             </note>
         </measure>
     </part>
