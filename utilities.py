@@ -2,6 +2,19 @@
 import re
 import string
 
+def string_to_number(s):
+    try:
+        return int(s)
+    except ValueError:
+        return float(s)
+
+def string_to_integer(s):
+    num = string_to_number(s)
+    if isinstance(num, int):
+        return num
+    else:
+        return int(num)
+        
 def escape_ly_output_string (input_string):
     return_string = input_string
     needs_quotes = not re.match (u"^[a-zA-ZäöüÜÄÖßñ]*$", return_string);
@@ -23,7 +36,7 @@ def musicxml_duration_to_log (dur):
              '64th': 6,
              '32nd': 5,
              '16th': 4,
-             'eighth': 3,
+             'eighth': 3, 
              'quarter': 2,
              'half': 1,
              'whole': 0,

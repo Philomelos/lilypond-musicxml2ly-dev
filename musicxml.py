@@ -275,7 +275,7 @@ class Credit (Xml_node):
         justify = None
         if (words != None):
             if hasattr(words, 'font-size'):
-                size = int(getattr(words, 'font-size'))
+                size = utilities.string_to_integer(getattr(words, 'font-size'))
             if hasattr(words, 'default-x'):
                 x = round(float(getattr(words, 'default-x')))
             if hasattr(words, 'default-y'):
@@ -312,13 +312,13 @@ class Credit (Xml_node):
 
         return None # no type recognized
 
-    def get_font_sizes (self, credits):
+    def get_font_sizes(self, credits):
         sizes = []
         for cred in credits:
             words = cred.get_maybe_exist_named_child('credit-words')
             if ((words != None) and hasattr(words, 'font-size')):
                 sizes.append(getattr(words, 'font-size'))
-        return map(int, sizes)
+        return map(utilities.string_to_integer, sizes)
 
     def get_default_xs (self, credits):
         default_xs = []
