@@ -154,7 +154,18 @@ class Identification (Xml_node):
         rights = self.get_named_children ('rights')
         ret = []
         for r in rights:
-          ret.append (r.get_text ())
+            text = r.get_text()
+            # if this Xml_node has an attribute, such as 'type="words"',
+            # include it in the header. Otherwise, it is assumed that
+            # the text contents of this node looks something like this:
+            # 'Copyright: X.Y.' and thus already contains the relevant
+            # information.
+            if hasattr(r, 'type'):
+                rights_type = r.type.title() # capitalize first letter
+                result = ''.join([rights_type, ': ', text])
+                ret.append(result)
+            else:
+                ret.append(text)
         return string.join (ret, "\n")
 
     # get contents of the source-element (usually used for publishing information). (These contents are saved in a custom variable named "source" in the header of the .ly file.)
