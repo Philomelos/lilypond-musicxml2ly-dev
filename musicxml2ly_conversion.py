@@ -10,6 +10,7 @@ import zipfile
 import tempfile
 import StringIO
 import utilities
+import warnings
 
 """
 
@@ -89,25 +90,39 @@ additional_definitions = {
 def round_to_two_digits (val):
     return round (val * 100) / 100
 
-def extract_paper_information (tree):
+def extract_paper_information(tree):
     defaults = tree.get_maybe_exist_named_child ('defaults')
     if not defaults:
         return None
     tenths = -1
     scaling = defaults.get_maybe_exist_named_child ('scaling')
+    default_tenths_to_millimeters_ratio = 0.175
+    default_staff_size = 20
     if scaling:
         mm = scaling.get_named_child ('millimeters')
-        mm = string.atof (mm.get_text ())
+        mm = float(mm.get_text())
         tn = scaling.get_maybe_exist_named_child ('tenths')
-        tn = string.atof (tn.get_text ())
-        tenths = mm / tn
-        paper.global_staff_size = mm * 72.27 / 25.4
+        tn = float(tn.get_text())
+        # The variable 'tenths' is actually a ratio, NOT the value of <tenths>.
+        # TODO: rename and replace. 
+        tenths = mm / tn 
+        ratio = tenths / default_tenths_to_millimeters_ratio
+        staff_size = default_staff_size * ratio
+
+        if 1 < staff_size < 100:
+            paper.global_staff_size = staff_size
+        else:
+            msg = "paper.global_staff_size {} is too large, using defaults=20".format(
+                staff_size)
+            warnings.warn(msg)
+            paper.global_staff_size = 20
+        
     # We need the scaling (i.e. the size of staff tenths for everything!
     if tenths < 0:
         return None
 
     def from_tenths (txt):
-        return round_to_two_digits (string.atof (txt) * tenths / 10)
+        return round_to_two_digits (float (txt) * tenths / 10)
     def set_paper_variable (varname, parent, element_name):
         el = parent.get_maybe_exist_named_child (element_name)
         if el: # Convert to cm from tenths
