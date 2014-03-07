@@ -895,7 +895,7 @@ class Paper:
         # TODO: Compute the indentation with the instrument name lengths
 
         # TODO: font width ?
-        char_per_cm = (len(self.get_longest_instrument_name()) * 8)/(self.page_width-self.right_margin-self.left_margin)
+        char_per_cm = (len(self.get_longest_instrument_name()) * 13) / self.page_width
         if (self.indent != 0):
             self.print_length_field (printer, "indent", self.indent/char_per_cm)
         if (self.short_indent != 0):
