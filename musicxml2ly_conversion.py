@@ -2128,6 +2128,23 @@ def music_xml_fretboards_name_to_lily_name (part_id, voicename):
     str = music_xml_voice_name_to_lily_name (part_id, voicename)+"FretBoards"
     return musicxml_id_to_lily (str)
 
+def get_all_lyric_parts_in_voice(voice):
+    '''
+    Collect the indexes of all lyric parts in this voice. 
+    In case not all of the current lyric parts are active (a typical case would be
+    a refrain/chorus), the current implementation inserts \skip-commands in the
+    inactive parts to keep them in sync.
+    '''
+    all_lyric_parts = []
+    for elem in voice._elements:
+        lyrics = elem.get_typed_children(musicxml.Lyric) 
+        if lyrics:
+            for lyric in lyrics:
+                index = lyric.number
+                if not index in all_lyric_parts:
+                    all_lyric_parts.append(index)
+    return all_lyric_parts
+
 def musicxml_voice_to_lily_voice (voice):
     tuplet_events = []
     modes_found = {}
@@ -2165,6 +2182,8 @@ def musicxml_voice_to_lily_voice (voice):
     current_measure_length = Rational (4, 4)
     voice_builder.set_measure_length (current_measure_length)
     in_slur = False
+
+    all_lyric_parts = set(get_all_lyric_parts_in_voice(voice))
 
     for idx, n in enumerate(voice._elements):
         tie_started = False
@@ -2562,6 +2581,7 @@ def musicxml_voice_to_lily_voice (voice):
             else:
                 ignoremelismata = None
 
+            active_lyric_parts = []
             for l in note_lyrics_elements:
                 if not(hasattr(n, "print-lyric") and getattr(n, "print-lyric") == "no"):
                     if l.get_number () < 0:
@@ -2569,12 +2589,19 @@ def musicxml_voice_to_lily_voice (voice):
                             lyrics[k].append (musicxml_lyrics_to_text (l, ignoremelismata))
                             note_lyrics_processed.append (k)
                     else:
-                        lyrics[l.number].append(musicxml_lyrics_to_text (l, ignoremelismata))
+                        text = musicxml_lyrics_to_text(l, ignoremelismata)
+                        lyrics[l.number].append(text)
                         note_lyrics_processed.append (l.number)
-
-            for lnr in lyrics.keys ():
-                if not ((lnr in note_lyrics_processed) or (ignoremelismata == None and (beamed == None or not(in_slur) or tied == None))):
-                    lyrics[lnr].append ("\skip4")
+                        active_lyric_parts.append(l.number)
+                    
+            # Check if any of the lyric parts in this voice is _not_ active.
+            # If so, insert a \skip-command to keep all lyric parts in sync.
+            if all([isinstance(n, musicxml.Note),
+                    n.get_typed_children(musicxml.Lyric),
+                    active_lyric_parts]):
+                inactive = list(all_lyric_parts - set(active_lyric_parts))
+                for index in inactive:
+                    lyrics[index].append(r"\set ignoreMelismata = ##t \skip4")
 
             if (slurred == "stop"):
                 in_slur = False
