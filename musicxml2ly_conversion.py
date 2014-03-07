@@ -424,7 +424,7 @@ def extract_score_structure (part_list, staffinfo):
             staff.instrument_name = extract_display_text (partname)
         if staff.instrument_name:
             paper.indent = max(paper.indent, len(staff.instrument_name))
-
+            paper.instrument_names.append(staff.instrument_name) 
         partdisplay = el.get_maybe_exist_named_child ('part-abbreviation')
         if partdisplay:
             staff.short_instrument_name = partdisplay.get_text ()
