@@ -859,11 +859,22 @@ class Paper:
         self.top_system_distance = -1
         self.indent = 0
         self.short_indent = 0
+        self.instrument_names = []
 
     def print_length_field (self, printer, field, value):
         if value >= 0:
             printer.dump ("%s = %s\\cm" % (field, value))
             printer.newline ()
+
+    def get_longest_instrument_name(self):
+        result = ''
+        for name in self.instrument_names:
+            lines = name.split('\n')
+            for line in lines:
+                if len(line) > len(result):
+                    result = line
+        return result
+
     def print_ly (self, printer):
         if self.global_staff_size > 0:
             printer.dump ('#(set-global-staff-size %s)' % self.global_staff_size)
@@ -884,7 +895,7 @@ class Paper:
         # TODO: Compute the indentation with the instrument name lengths
 
         # TODO: font width ?
-        char_per_cm = 120/(self.page_width-self.right_margin-self.left_margin)
+        char_per_cm = (len(self.get_longest_instrument_name()) * 13) / self.page_width
         if (self.indent != 0):
             self.print_length_field (printer, "indent", self.indent/char_per_cm)
         if (self.short_indent != 0):
