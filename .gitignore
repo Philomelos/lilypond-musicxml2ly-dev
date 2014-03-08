@@ -1,5 +1,8 @@
 *.pyc
-*.xml
 *.ly
 *.ly~
+*.pdf
+*.tiff
+*.png
+*.xml
 
