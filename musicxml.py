@@ -122,6 +122,7 @@ class Music_xml_node (Xml_node):
         Xml_node.__init__ (self)
         self.duration = Rational (0)
         self.start = Rational (0)
+        self.converted = False 
 
 
 ################################################################################

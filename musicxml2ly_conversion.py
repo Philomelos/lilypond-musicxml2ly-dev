@@ -2261,12 +2261,17 @@ def musicxml_voice_to_lily_voice (voice):
                 fretboards_builder.add_bar_check (num)
 
         if isinstance (n, musicxml.Direction):
-            for a in musicxml_direction_to_lily (n):
-                if a.wait_for_note():
-                    voice_builder.add_dynamics (a)
-                else:
-                    voice_builder.add_command (a)
-            continue
+            # check if Direction already has been converted in another voice. 
+            if n.converted:
+                continue
+            else:
+                n.converted = True
+                for a in musicxml_direction_to_lily (n):
+                    if a.wait_for_note():
+                        voice_builder.add_dynamics (a)
+                    else:
+                        voice_builder.add_command (a)
+                continue
 
         # Start any new multimeasure rests
         if (rest and rest.is_whole_measure ()):
