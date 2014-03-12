@@ -6,6 +6,7 @@ import re
 import math
 import lilylib as ly
 import warnings
+import utilities
 
 _ = ly._
 
@@ -133,10 +134,10 @@ class Output_printer(object):
             self._skipspace = False
             self.unformatted_output (str)
         else:
-            words = string.split (str)
+            # Avoid splitting quoted strings (e.g. "1. Wie") when indenting.
+            words = utilities.split_string_and_preserve_doublequoted_substrings(str)
             for w in words:
                 self.add_word (w)
-
 
     def close (self):
         self.newline ()
@@ -798,7 +799,7 @@ class Lyrics:
         printer.dump (self.ly_expression ())
 
     def ly_expression (self):
-        lstr = "\lyricmode {\n  "
+        lstr = "\lyricmode {\set ignoreMelismata = ##t"
         for l in self.lyrics_syllables:
             lstr += l
         lstr += "\n}"

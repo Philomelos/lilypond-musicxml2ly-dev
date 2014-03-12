@@ -62,3 +62,11 @@ def hex_to_color(hex_val):
         return map(lambda x: hexcolorval_to_nr (x), res.group (2, 3, 4))
     else:
         return None
+
+def split_string_and_preserve_doublequoted_substrings(value):
+    import shlex
+    lex = shlex.shlex(value)
+    lex.quotes = '"'
+    lex.whitespace_split = True
+    lex.commenters = ''
+    return list(lex)
