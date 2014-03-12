@@ -1,6 +1,13 @@
 lilypond-musicxml2ly-dev
 ========================
 
+INSTALLATION NOTE:
+* You need to have a current version of lilypond installed
+* In your clone of the repository, you need to create symbolic links:
+ * ln -sf /my_lilypond_path/usr/share/lilypond/current/python/lilylib.py
+ * ln -sf /my_lilypond_path/usr/share/lilypond/current/python/rational.py
+* If these links do not point at the correct files, musicxml2ly-dev might not work!
+
 A fork of musicxml2ly for philomelos.net
 
 v0.1.13:
