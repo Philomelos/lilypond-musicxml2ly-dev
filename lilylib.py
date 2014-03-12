@@ -1,1 +1,0 @@
-/opt/lilypond/usr/share/lilypond/current/python/lilylib.py
