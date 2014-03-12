@@ -1242,14 +1242,14 @@ class Part (Music_xml_node):
             voice_id = n.get_maybe_exist_named_child (u'voice')
             vid = None
             if voice_id:
-                vid = voice_id.get_text ()
-            elif isinstance (n, Note):
+                vid = voice_id.get_text()
+            elif isinstance(n, Note):
                 # TODO: Check whether we shall really use "None" here, or
                 #       rather use "1" as the default?
                 if n.get_maybe_exist_named_child(u'chord'):
                     vid = last_voice
                 else:
-                    vid = "None"
+                    vid = "1"
 
             if (vid != None):
                 last_voice = vid
@@ -1292,7 +1292,7 @@ class Part (Music_xml_node):
                 if n.get_maybe_exist_typed_child (get_class ('chord')):
                     id = last_voice
                 else:
-                    id = "None"
+                    id = "1"
 
             if (id != "None"):
                 last_voice = id
