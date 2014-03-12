@@ -2145,6 +2145,48 @@ def get_all_lyric_parts_in_voice(voice):
                     all_lyric_parts.append(index)
     return all_lyric_parts
 
+
+def extract_lyrics(voice, lyric_key, lyrics_dict):
+    curr_number = None
+    result = []
+
+    def is_note(elem):
+        return isinstance(elem, musicxml.Note)
+
+    def is_rest(elem):
+        return elem.get_typed_children(musicxml.Rest)
+
+    def is_note_and_not_rest(elem):
+        return is_note(elem) and not is_rest(elem)
+
+    def get_lyric_elements(note):
+        return note.get_typed_children(musicxml.Lyric)
+
+    def has_lyric_belonging_to_lyric_part(note, lyric_part_id):
+        lyric_elements = get_lyric_elements(note)
+        lyric_numbers = [lyric.number for lyric in lyric_elements]
+        return any([lyric_number == lyric_part_id for lyric_number in lyric_numbers])
+
+    for idx, elem in enumerate(voice._elements):
+        lyrics = get_lyric_elements(elem)
+        lyric_keys = [lyric.number for lyric in lyrics]
+        note_has_lyric_belonging_to_lyric_part = lyric_key in lyric_keys
+        # Current note has lyric with 'number' matching 'lyric_key'.
+        if note_has_lyric_belonging_to_lyric_part:
+            for lyric in lyrics:
+                if lyric.number == lyric_key:
+                    text = musicxml_lyrics_to_text(lyric, None)
+                    result.append(text)
+        # Note has any lyric.
+        elif get_lyric_elements(elem) and \
+             not note_has_lyric_belonging_to_lyric_part:
+            result.append('\skip1 ')
+        # Note does not have any lyric attached to it.
+        elif is_note_and_not_rest(elem):
+            result.append('\skip1 ')
+        
+    lyrics_dict[lyric_key].extend(result)
+
 def musicxml_voice_to_lily_voice (voice):
     tuplet_events = []
     modes_found = {}
@@ -2184,6 +2226,9 @@ def musicxml_voice_to_lily_voice (voice):
     in_slur = False
 
     all_lyric_parts = set(get_all_lyric_parts_in_voice(voice))
+    if lyrics.keys():
+        for number in lyrics.keys():
+            extracted_lyrics = extract_lyrics(voice, number, lyrics)
 
     for idx, n in enumerate(voice._elements):
         tie_started = False
@@ -2322,16 +2367,13 @@ def musicxml_voice_to_lily_voice (voice):
             n.message (_ ('unexpected %s; expected %s or %s or %s') % (n, 'Note', 'Attributes', 'Barline'))
             continue
 
-        ### change
-        # main_event = musicxml_note_to_lily_main_event (n)
-        
         if not hasattr(conversion_settings, 'convert_rest_positions'):
             conversion_settings.convert_rest_positions = False
 
         main_event = n.to_lily_object(
             convert_stem_directions=conversion_settings.convert_stem_directions,
             convert_rest_positions=conversion_settings.convert_rest_positions)
-    
+
         if main_event and not first_pitch:
             first_pitch = main_event.pitch
         # ignore lyrics for notes inside a slur, tie, chord or beam
@@ -2431,7 +2473,7 @@ def musicxml_voice_to_lily_voice (voice):
                 fretboards_builder.add_music (fb, ev_chord.get_length ())
             pending_fretboards = []
 
-        notations_children = n.get_typed_children (musicxml.Notations)
+        notations_children = n.get_typed_children(musicxml.Notations)
         tuplet_event = None
         span_events = []
 
@@ -2557,59 +2599,6 @@ def musicxml_voice_to_lily_voice (voice):
                     is_beamed = True
                 elif beam_ev.span_direction == 1: # beam and thus melisma ends here
                     is_beamed = False
-
-        # Extract the lyrics
-        if not (rest or ignore_lyrics):
-            note_lyrics_processed = []
-            note_lyrics_elements = n.get_typed_children (musicxml.Lyric)
-            beamed = n.get_named_children('beam')
-            if ( len(beamed) != 0):
-                beamed = beamed[0].get_text ()
-            else:
-                beamed = None
-            slurred = None
-            tied = None
-            if ( n.get_maybe_exist_named_child ('notations') != None):
-                slurred = n.get_named_child ('notations').get_maybe_exist_named_child ('slur')
-                if ( slurred != None):
-                    slurred = slurred.get_type ()
-                    if (slurred == "start" or slurred == "continue"):
-                        in_slur == True
-                tied = n.get_named_child ('notations').get_maybe_exist_named_child ('tied')
-                if ( tied != None):
-                    tied = tied.get_type ()
-
-            if (beamed == "begin" or slurred == "start") and (len(voice._elements[idx+1].get_typed_children (musicxml.Lyric)) != 0):
-                ignoremelismata = "on"
-            elif (beamed == "end" or slurred == "stop") and (len(note_lyrics_elements) != 0):
-                ignoremelismata = "off"
-            else:
-                ignoremelismata = None
-
-            active_lyric_parts = []
-            for l in note_lyrics_elements:
-                if not(hasattr(n, "print-lyric") and getattr(n, "print-lyric") == "no"):
-                    if l.get_number () < 0:
-                        for k in lyrics.keys ():
-                            lyrics[k].append (musicxml_lyrics_to_text (l, ignoremelismata))
-                            note_lyrics_processed.append (k)
-                    else:
-                        text = musicxml_lyrics_to_text(l, ignoremelismata)
-                        lyrics[l.number].append(text)
-                        note_lyrics_processed.append (l.number)
-                        active_lyric_parts.append(l.number)
-                    
-            # Check if any of the lyric parts in this voice is _not_ active.
-            # If so, insert a \skip-command to keep all lyric parts in sync.
-            if all([isinstance(n, musicxml.Note),
-                    n.get_typed_children(musicxml.Lyric),
-                    active_lyric_parts]):
-                inactive = list(all_lyric_parts - set(active_lyric_parts))
-                for index in inactive:
-                    lyrics[index].append(r"\set ignoreMelismata = ##t \skip4")
-
-            if (slurred == "stop"):
-                in_slur = False
 
         # Assume that a <tie> element only lasts for one note.
         # This might not be correct MusicXML interpretation, but works for
