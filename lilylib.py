@@ -1,1 +1,1 @@
-/Applications/LilyPond.app/Contents/Resources/share/lilypond/current/python/lilylib.py
+/opt/lilypond/usr/share/lilypond/current/python/lilylib.py
