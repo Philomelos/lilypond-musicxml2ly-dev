@@ -2277,7 +2277,7 @@ class Score:
             printer.newline()
             printer.dump("\\score {")
             printer.newline ()
-            printer.dump("\\unfoldRepeats {")
+            printer.dump("\\unfoldRepeats \\articulate {")
             printer.newline ()
             self.contents.print_ly(printer)
             printer.dump("}")
