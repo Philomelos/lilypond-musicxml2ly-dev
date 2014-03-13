@@ -2264,15 +2264,25 @@ class Score:
 	@param printer: A printer given to display correctly the output.
 	@type printer: L{Output_printer<musicexp.Output_printer>}
 	"""
-        self.create_midi = get_create_midi ()
-        printer.dump ("\\score {")
+        self.create_midi = get_create_midi()
+        printer.dump("\\score {")
         printer.newline ()
         if self.contents:
-            self.contents.print_ly (printer)
+            self.contents.print_ly(printer)
         printer.dump ("\\layout {}")
         printer.newline ()
         # If the --midi option was not passed to musicxml2ly, that comments the "midi" line
-        if not self.create_midi:
+        if self.create_midi:
+            printer.dump ("}")
+            printer.newline()
+            printer.dump("\\score {")
+            printer.newline ()
+            printer.dump("\\unfoldRepeats {")
+            printer.newline ()
+            self.contents.print_ly(printer)
+            printer.dump("}")
+            printer.newline ()
+        else:
             printer.dump ("% To create MIDI output, uncomment the following line:")
             printer.newline ()
             printer.dump ("% ")
