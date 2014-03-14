@@ -2047,6 +2047,7 @@ class StaffGroup:
         self.stafftype = command
         self.id = None
         self.instrument_name = None
+        self.sound = None
         self.short_instrument_name = None
         self.symbol = None
         self.spanbar = None
@@ -2124,13 +2125,13 @@ class StaffGroup:
         except TypeError:
             return
 
-
     def print_ly (self, printer):
         printer.dump("<<\n")
         self.print_chords(printer)
         self.print_fretboards(printer)
         if self.stafftype:
-            printer.dump ("\\new %s" % self.stafftype)
+            printer.dump("\\new %s" % self.stafftype)
+            printer.newline()
         self.print_ly_overrides (printer)
         printer.dump ("<<")
         printer.newline ()
@@ -2142,6 +2143,10 @@ class StaffGroup:
             printer.dump ("\\set %s.shortInstrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.short_instrument_name)))
             printer.newline ()
+        if self.sound:
+            printer.dump(
+                r'\set {stafftype}.midiInstrument = #"{sound}"'.format(
+                    stafftype=self.stafftype, sound=self.sound))
         self.print_ly_contents (printer)
         printer.newline ()
         printer.dump (">>")
@@ -2155,6 +2160,7 @@ class Staff (StaffGroup):
         self.part = None
         self.voice_command = "Voice"
         self.substafftype = None
+        self.sound = None 
 
     def needs_with (self):
         return False
@@ -2168,6 +2174,7 @@ class Staff (StaffGroup):
         sub_staff_type = self.substafftype
         if not sub_staff_type:
             sub_staff_type = self.stafftype
+        printer.newline()
 
         for [staff_id, voices] in self.part_information:
             # now comes the real staff definition:

@@ -908,8 +908,8 @@ class Part_list (Music_xml_node):
         for score_part in self.get_named_children ('score-part'):
             for instr in score_part.get_named_children ('score-instrument'):
                 id = instr.id
-                name = instr.get_named_child ("instrument-name")
-                mapping[id] = name.get_text ()
+                name = instr.get_named_child("instrument-name")
+                mapping[id] = name.get_text()
 
         self._id_instrument_name_dict = mapping
 

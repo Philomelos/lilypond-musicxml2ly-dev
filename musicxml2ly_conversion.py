@@ -397,6 +397,14 @@ def staff_attributes_to_lily_staff (mxl_attr):
 
     return staff
 
+def extract_instrument_sound(score_part):
+    score_instrument = score_part.get_maybe_exist_named_child('score-instrument')
+    if not score_instrument:
+        return None
+    sound = score_instrument.get_maybe_exist_named_child('instrument-sound')
+    if sound:
+        return utilities.musicxml_sound_to_lilypond_midi_instrument(sound.get_text())
+
 def extract_score_structure (part_list, staffinfo):
     score = musicexp.Score ()
     structure = musicexp.StaffGroup (None)
@@ -421,7 +429,9 @@ def extract_score_structure (part_list, staffinfo):
         # part-name-display overrides part-name!
         partname = el.get_maybe_exist_named_child ("part-name-display")
         if partname:
-            staff.instrument_name = extract_display_text (partname)
+            staff.instrument_name = extract_display_text(partname)
+        if options.midi:
+            staff.sound = extract_instrument_sound(el)
         if staff.instrument_name:
             paper.indent = max(paper.indent, len(staff.instrument_name))
             paper.instrument_names.append(staff.instrument_name) 
