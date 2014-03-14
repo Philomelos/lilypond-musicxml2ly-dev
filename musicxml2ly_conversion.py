@@ -1980,7 +1980,9 @@ class LilyPondVoiceBuilder:
 
         if isinstance(music, musicexp.BarLine):
             if self.pending_dynamics:
-                self.add_pending_dynamics()
+                for d in self.pending_dynamics:
+                    if not isinstance(d, (musicexp.SpanEvent, musicexp.DynamicsEvent)):
+                        self.add_pending_dynamics()
 
         self.elements.append(music)
         self.begin_moment = self.end_moment
