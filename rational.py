@@ -1,1 +1,0 @@
-/Applications/LilyPond.app/Contents/Resources/share/lilypond/current/python/rational.py
