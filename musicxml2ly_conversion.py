@@ -2789,7 +2789,7 @@ If the given filename is -, musicxml2ly reads from the command line.
                  action="help",
                  help=_("show this help and exit"))
 
-    p.version = ('''%prog (dev) 2.15.95-philomelos-0.1.13\n\n'''
+    p.version = ('''%prog (dev) musicxml2ly-dev v0.2.34\n\n'''
 + 
 _ ("""Copyright (c) 2005--2011 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
