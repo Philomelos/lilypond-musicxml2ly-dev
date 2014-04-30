@@ -3069,8 +3069,7 @@ def update_layout_information():
 
 def print_ly_preamble(printer, filename):
     printer.dump_version()
-#    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('%% automatically converted by musicxml2ly-dev v0.2.34\n')
+    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
     if options.midi:
         printer.newline()
         printer.dump(r'\include "articulate.ly"')
