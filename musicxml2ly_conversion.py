@@ -3071,7 +3071,7 @@ def update_layout_information():
 def print_ly_preamble(printer, filename):
     printer.dump_version()
 #    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('% automatically converted by Philomelos musicxml2ly v0.2.34\n')
+    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.35\n')
     printer.newline()
     printer.dump(r'\pointAndClickOff')
     printer.newline()
