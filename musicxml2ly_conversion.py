@@ -50,6 +50,7 @@ class Conversion_Settings:
     def __init__(self):
        self.ignore_beaming = False 
        self.convert_stem_directions = False
+       self.convert_rest_positions = True
 
 conversion_settings = Conversion_Settings()
 # Use a global variable to store the setting needed inside a \layout block.
@@ -1991,7 +1992,7 @@ class LilyPondVoiceBuilder:
         if isinstance(music, musicexp.BarLine):
             if self.pending_dynamics:
                 for d in self.pending_dynamics:
-                    if not isinstance(d, (musicexp.SpanEvent, musicexp.DynamicsEvent)):
+                    if not isinstance(d, (musicexp.SpanEvent, musicexp.DynamicsEvent)):       
                         index = self.pending_dynamics.index(d)
                         dyn = self.pending_dynamics.pop(index)
                         self.elements.append(dyn)
@@ -2325,12 +2326,12 @@ def musicxml_voice_to_lily_voice(voice):
                 continue
             else:
                 n.converted = True
-                for a in musicxml_direction_to_lily(n):
-                    if a.wait_for_note():
-                        voice_builder.add_dynamics(a)
+                for direction in musicxml_direction_to_lily(n):
+                    if direction.wait_for_note():
+                        voice_builder.add_dynamics(direction)
                     else:
-                        voice_builder.add_command(a)
-                continue
+                        voice_builder.add_command(direction)
+                continue  
 
         # Start any new multimeasure rests
         if (rest and rest.is_whole_measure()):
@@ -2381,8 +2382,8 @@ def musicxml_voice_to_lily_voice(voice):
             n.message(_('unexpected %s; expected %s or %s or %s') % (n, 'Note', 'Attributes', 'Barline'))
             continue
 
-        if not hasattr(conversion_settings, 'convert_rest_positions'):
-            conversion_settings.convert_rest_positions = False
+#        if not hasattr(conversion_settings, 'convert_rest_positions'):
+#            conversion_settings.convert_rest_positions = True
 
         main_event = n.to_lily_object(
             convert_stem_directions=conversion_settings.convert_stem_directions,
@@ -3070,7 +3071,10 @@ def update_layout_information():
 def print_ly_preamble(printer, filename):
     printer.dump_version()
 #    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('%% automatically converted by musicxml2ly-dev v0.2.34\n')
+    printer.print_verbatim('% automatically converted by Philomelos musicxml2ly v0.2.34\n')
+    printer.newline()
+    printer.dump(r'\pointAndClickOff')
+    printer.newline()
     if options.midi:
         printer.newline()
         printer.dump(r'\include "articulate.ly"')
@@ -3206,7 +3210,7 @@ def convert(filename, options):
     score.print_ly(printer)
     printer.newline()
 
-    # Conversion from 2.15.95 to current version
+    # Syntax update to current version
     if (options.output_name != "-"):
         version = os.popen("lilypond --version | head -1 | cut -d' ' -f3").read().strip()
         ly.progress(_("Converting to current version (%s) notations ..." % version), True)

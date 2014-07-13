@@ -1316,7 +1316,7 @@ class TextEvent (Event):
         self.force_direction = None
         self.markup = ''
     def wait_for_note (self):
-        return True
+        return False
 
     def direction_mod (self):
         return { 1: '^', -1: '_', 0: '-' }.get (self.force_direction, '-')
@@ -1650,7 +1650,7 @@ class SkipEvent (RhythmicEvent):
 class NoteEvent(RhythmicEvent):
     def  __init__ (self):
         RhythmicEvent.__init__ (self)
-        self.pitch = None
+        #self.pitch = None
         self.drum_type = None
         self.cautionary = False
         self.forced_accidental = False
@@ -2133,8 +2133,8 @@ class StaffGroup:
             printer.dump("\\new %s" % self.stafftype)
             printer.newline()
         self.print_ly_overrides (printer)
-        printer.dump ("<<")
-        printer.newline ()
+        #printer.dump ("<<")
+        #printer.newline ()
         if self.stafftype and self.instrument_name:
             printer.dump ("\\set %s.instrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.instrument_name)))
@@ -2149,7 +2149,7 @@ class StaffGroup:
                     stafftype=self.stafftype, sound=self.sound))
         self.print_ly_contents (printer)
         printer.newline ()
-        printer.dump (">>")
+        #printer.dump (">>")
         printer.dump (">>")
 
 
@@ -2183,12 +2183,17 @@ class Staff (StaffGroup):
             else:
                 printer ('\\context %s << ' % sub_staff_type)
             printer.newline ()
+            printer.dump("\mergeDifferentlyDottedOn\mergeDifferentlyHeadedOn")
+            printer.newline()
             n = 0
             nr_voices = len (voices)
             for [v, lyrics, figuredbass, chordnames, fretboards] in voices:
                 n += 1
                 voice_count_text = ''
                 if nr_voices > 1:
+                    """ 
+The next line contains a bug: The voices might not appear in numerical order! Some voices might be missing e.g. if the xml file contains only voice one, three and four, this would result in: \voiceOne, \voiceTwo and \voiceThree. This causes wrong stem directions and collisions. 
+                    """
                     voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo', 3: ' \\voiceThree'}.get (n, ' \\voiceFour')
                 printer ('\\context %s = "%s" {%s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
                 printer.newline ()
