@@ -219,6 +219,7 @@ def extract_score_information(tree):
         set_if_exists('title', movement_title.get_text())
     if movement_number:
           set_if_exists('movementnumber', movement_number.get_text())
+          # set_if_exists('piece', movement_number.get_text()) # the movement number should be visible in the score.
 
     work = tree.get_maybe_exist_named_child('work')
     if work:
@@ -1348,8 +1349,8 @@ def get_font_size(size):
 def musicxml_words_to_lily_event(words):
     event = musicexp.TextEvent()
     text = words.get_text()
-    text = re.sub('^ *\n? *', '', text)
-    text = re.sub(' *\n? *$', '', text)
+    text = re.sub('^ *\n? *', '', text) #remove white spaces and line breaks before text
+    text = re.sub(' *\n? *$', '', text) #remove white spaces and line breaks before text
     event.text = text
 
     if hasattr(words, 'default-y') and hasattr(options, 'convert_directions') and options.convert_directions:
@@ -2790,7 +2791,7 @@ If the given filename is -, musicxml2ly reads from the command line.
                  action="help",
                  help=_("show this help and exit"))
 
-    p.version = ('''%prog (dev) v0.2.34\n\n'''
+    p.version = ('''%prog (dev) v0.2.36\n\n'''
 + 
 _ ("""Copyright (c) 2005--2011 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
@@ -3071,7 +3072,7 @@ def update_layout_information():
 def print_ly_preamble(printer, filename):
     printer.dump_version()
 #    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.35\n')
+    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.36\n')
     printer.newline()
     printer.dump(r'\pointAndClickOff')
     printer.newline()

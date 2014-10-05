@@ -829,8 +829,8 @@ class Header:
             printer.dump('}')
             printer.newline()
         else:
-            printer.newline()
             printer.dump(value)
+	printer.newline()
 
     def print_ly (self, printer):
         printer.dump ("\header {")
@@ -838,6 +838,19 @@ class Header:
         for (k, v) in self.header_fields.items ():
             if v:
                self.format_header_strings(k, v, printer)
+	#printer.newline ()
+	printer.dump (r'tagline = \markup {')
+	printer.newline ()
+	printer.dump (r'  \center-column {')
+	printer.newline ()
+	printer.dump ('\line {"Music engraving by LilyPond " $(lilypond-version) | \with-url #"http://www.lilypond.org" {www.lilypond.org}}')
+	printer.newline ()
+	printer.dump ('\line {\with-url #"https://philomelos.net" {\with-color #grey {Learn, teach and share music on https://philomelos.net}}}')
+	printer.newline ()
+	printer.dump ('}')
+	printer.newline ()
+	printer.dump ('}')
+	printer.newline ()
         printer.dump ("}")
         printer.newline ()
         printer.newline ()
@@ -1316,9 +1329,30 @@ class TextEvent (Event):
         self.force_direction = None
         self.markup = ''
     def wait_for_note (self):
-        return False
+	""" This is problematic: the lilypond-markup ^"text" 
+	requires wait_for_note to be true. Otherwise the
+	compilation will fail.  So we are forced to set return to True.
+	But in some cases this might lead to a wrong placement of the text.
+	In case of words like Allegro the text should be put in a '\tempo'-command.
+	In this case we don't want to wait for the next note.
+	In some other cases the text is supposed to be used in a '\mark\markup' construct.
+	We would not want to wait for the next note either.
+	There might be other problematic situations.
+	In the long run we should differentiate between various contexts in MusicXML, e.g.
+	the following markup should be interpreted as '\tempo "Allegretto"':
+		<direction placement="above">
+        	    <direction-type>
+          		<words>Allegretto</words>
+        	    </direction-type>
+        	    <sound tempo="120"/>
+      		</direction>
+	In the mean time arising problems have to be corrected manually after the conversion.
+	"""
+        return True
 
     def direction_mod (self):
+	""" 1: placement="above"; -1: placement="below"; 0: no placement attribute. 
+	see musicxml_direction_to_indicator in musicxml2ly_conversion.py """
         return { 1: '^', -1: '_', 0: '-' }.get (self.force_direction, '-')
 
     def ly_expression (self):
@@ -2126,11 +2160,13 @@ class StaffGroup:
             return
 
     def print_ly (self, printer):
-        printer.dump("<<\n")
+        #printer.dump("<<")
+	#printer.newline ()
         self.print_chords(printer)
         self.print_fretboards(printer)
         if self.stafftype:
             printer.dump("\\new %s" % self.stafftype)
+	    printer.dump ("<<")
             printer.newline()
         self.print_ly_overrides (printer)
         #printer.dump ("<<")
@@ -2138,7 +2174,7 @@ class StaffGroup:
         if self.stafftype and self.instrument_name:
             printer.dump ("\\set %s.instrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.instrument_name)))
-            printer.newline ()
+            #printer.newline ()
         if self.stafftype and self.short_instrument_name:
             printer.dump ("\\set %s.shortInstrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.short_instrument_name)))
@@ -2150,7 +2186,8 @@ class StaffGroup:
         self.print_ly_contents (printer)
         printer.newline ()
         #printer.dump (">>")
-        printer.dump (">>")
+        #printer.dump (">>")
+	#printer.newline ()
 
 
 class Staff (StaffGroup):
@@ -2201,14 +2238,17 @@ The next line contains a bug: The voices might not appear in numerical order! So
                     printer ('\\new Lyrics \\lyricsto "%s" \\%s' % (v, l))
                     printer.newline()
                 if figuredbass:
-                    printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))
+                    printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))		
             printer ('>>')
+	    #printer.newline ()
 
     def print_ly (self, printer):
         if self.part_information and len (self.part_information) > 1:
             self.stafftype = "PianoStaff"
             self.substafftype = "Staff"
         StaffGroup.print_ly (self, printer)
+	printer.dump ('>>')
+	#printer.newline ()
 
 class TabStaff (Staff):
     def __init__ (self, command="TabStaff"):
@@ -2279,8 +2319,12 @@ class Score:
         self.create_midi = get_create_midi()
         printer.dump("\\score {")
         printer.newline ()
+	printer.dump ('<<')
+	printer.newline ()
         if self.contents:
             self.contents.print_ly(printer)
+	printer.dump ('>>')
+	printer.newline ()
         printer.dump ("\\layout {}")
         printer.newline ()
         # If the --midi option was not passed to musicxml2ly, that comments the "midi" line
