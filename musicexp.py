@@ -2111,6 +2111,8 @@ class StaffGroup:
         for c in self.children:
             if c:
                 c.print_ly (printer)
+	#printer.dump ("test")# test is printed twice at the end of a staffgroup with two staves.
+        #printer ("test") # test is printed twice at the end of a staffgroup with two staves.
 
     def needs_with (self):
         needs_with = False
@@ -2119,6 +2121,7 @@ class StaffGroup:
         needs_with |= self.short_instrument_name != None
         needs_with |= (self.symbol != None) and (self.symbol != "bracket")
         return needs_with
+
     def print_ly_context_mods (self, printer):
         if self.instrument_name or self.short_instrument_name:
             printer.dump ("\\consists \"Instrument_name_engraver\"")
@@ -2185,9 +2188,19 @@ class StaffGroup:
                     stafftype=self.stafftype, sound=self.sound))
         self.print_ly_contents (printer)
         printer.newline ()
+# This is a crude hack: In scores with staff groups the closing angled brackets are not printed.
+# That's why I added the following two lines. I couldn't find a proper solution. This won't work with scores several staff groups!!!
+	if self.stafftype == "StaffGroup":
+	    printer.dump (">>")
         #printer.dump (">>")
         #printer.dump (">>")
 	#printer.newline ()
+	#printer.dump ("test") #test is printed 4 times in a staffgroup with two staves: once at the end of each staff and twice at the end of the staffgroup. That's not what we want!
+    #printer.dump ("test") NameError: name 'printer' is not defined	
+
+#test    
+#    def print_staffgroup_closing_brackets (self, printer): #test see class Staff / Score. 
+#	printer.dump ("test")
 
 
 class Staff (StaffGroup):
@@ -2203,6 +2216,7 @@ class Staff (StaffGroup):
         return False
 
     def print_ly_context_mods (self, printer):
+	#printer.dump ("test") #does nothing.
         pass
 
     def print_ly_contents (self, printer):
@@ -2211,6 +2225,7 @@ class Staff (StaffGroup):
         sub_staff_type = self.substafftype
         if not sub_staff_type:
             sub_staff_type = self.stafftype
+	#printer.dump ("test") #prints test in each staff after the definitions of the instrument name and before the definition of the contexts.
         printer.newline()
 
         for [staff_id, voices] in self.part_information:
@@ -2242,15 +2257,24 @@ The next line contains a bug: The voices might not appear in numerical order! So
                 if figuredbass:
                     printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))		
             printer ('>>')
+	    #printer.dump ("test") #prints test after each definition of a context.
 	    #printer.newline ()
+	#printer.dump ("test") #prints test after each definition of a context.
 
     def print_ly (self, printer):
         if self.part_information and len (self.part_information) > 1:
             self.stafftype = "PianoStaff"
             self.substafftype = "Staff"
+	    #printer.dump ('test')
         StaffGroup.print_ly (self, printer)
+	#StaffGroup.print_staffgroup_closing_brackets (self, printer) prints test after each definition of a staff
 	printer.dump ('>>')
-	#printer.newline ()
+	#printer.dump ("test") #prints test after each definition of a context.
+	printer.newline ()
+	#StaffGroup.print_staffgroup_closing_brackets(self, printer) #prints test after each definition of a staff.
+    #printer.dump ("test")# NameError: name 'printer' is not defined
+    #StaffGroup.print_staffgroup_closing_brackets() #TypeError: unbound method print_staffgroup_closing_brackets() must be called with StaffGroup instance as first argument (got nothing instead)
+	
 
 class TabStaff (Staff):
     def __init__ (self, command="TabStaff"):
@@ -2286,6 +2310,10 @@ class RhythmicStaff (Staff):
     def __init__ (self, command="RhythmicStaff"):
         Staff.__init__ (self, command)
 
+#Test
+#def print_staffgroup_closing_brackets (self, printer): #test see class Score / class Staff
+#	printer.dump ("test")
+
 class Score:
     def __init__ (self):
 	"""
@@ -2310,6 +2338,9 @@ class Score:
 	@type tempo: String
 	"""
         self.tempo = tempo
+    #Test
+#    def print_staffgroup_closing_brackets (self, printer): #test see class Score / class Staff
+#	printer.dump ("test")
 
     def print_ly (self, printer):
 	"""
@@ -2325,8 +2356,13 @@ class Score:
 	printer.newline ()
         if self.contents:
             self.contents.print_ly(printer)
+	    #printer.dump ("test") prints test once before the >> of the score block, independent of the existence of a staffgroup.
+	#if StaffGroup == False: # True or False: nothing happens.
+	#    printer.dump ('>>')
 	printer.dump ('>>')
 	printer.newline ()
+	#StaffGroup.print_staffgroup_closing_brackets(self, printer) #TypeError: unbound method print_staffgroup_closing_brackets() must be called with StaffGroup instance as first argument (got Score instance instead)
+        #print_staffgroup_closing_brackets(self, printer) #NameError: global name 'print_staffgroup_closing_brackets' is not defined. prints test once before the >> of the score block, independent of the existence of a staffgroup.
         printer.dump ("\\layout {}")
         printer.newline ()
         # If the --midi option was not passed to musicxml2ly, that comments the "midi" line

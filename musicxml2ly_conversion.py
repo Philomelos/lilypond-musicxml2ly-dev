@@ -290,8 +290,8 @@ def extract_score_information(tree):
         elif(type == 'title'):
             if(not(work) and not(movement_title)):
                 set_if_exists('title', cred.get_text())
-            elif(not(movement_title)):
-                set_if_exists('subtitle', cred.get_text())
+            #elif(not(movement_title)): #bullshit!
+            #    set_if_exists('subtitle', cred.get_text()) #bullshit! otherwise both title and subtitle show the work-title.
         elif(type == None):
             pass
         else:
