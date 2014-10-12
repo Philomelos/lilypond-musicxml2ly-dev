@@ -2234,8 +2234,10 @@ The next line contains a bug: The voices might not appear in numerical order! So
                     voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo', 3: ' \\voiceThree'}.get (n, ' \\voiceFour')
                 printer ('\\context %s = "%s" {%s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
                 printer.newline ()
+                lyrics_id = 1  
                 for l in lyrics:
-                    printer ('\\new Lyrics \\lyricsto "%s" \\%s' % (v, l))
+                    printer ('\\new Lyrics \\lyricsto "%s" { \\set stanza = "%s." \\%s }' % (v, lyrics_id, l))
+		    lyrics_id += 1
                     printer.newline()
                 if figuredbass:
                     printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))		
