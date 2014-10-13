@@ -895,6 +895,8 @@ class Paper:
             printer.newline ()
         printer.dump ('\\paper {')
         printer.newline ()
+	printer.dump ("markup-system-spacing #'padding = #1")
+	printer.newline ()
         self.print_length_field (printer, "paper-width", self.page_width)
         self.print_length_field (printer, "paper-height", self.page_height)
         self.print_length_field (printer, "top-margin", self.top_margin)
