@@ -2791,7 +2791,7 @@ If the given filename is -, musicxml2ly reads from the command line.
                  action="help",
                  help=_("show this help and exit"))
 
-    p.version = ('''%prog (dev) v0.2.39\n\n'''
+    p.version = ('''%prog (dev) v0.2.40\n\n'''
 + 
 _ ("""Copyright (c) 2005--2011 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
@@ -3072,7 +3072,7 @@ def update_layout_information():
 def print_ly_preamble(printer, filename):
     printer.dump_version()
 #    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.39\n')
+    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.40\n')
     printer.newline()
     printer.dump(r'\pointAndClickOff')
     printer.newline()

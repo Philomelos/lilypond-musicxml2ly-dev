@@ -1,0 +1,6 @@
+<map id="musicxml.ChordPitch" name="musicxml.ChordPitch">
+<area shape="rect" id="node4" href="$classmusicxml_1_1Bass.html" title="musicxml.Bass" alt="" coords="5,229,117,256"/>
+<area shape="rect" id="node5" href="$classmusicxml_1_1Root.html" title="musicxml.Root" alt="" coords="142,229,253,256"/>
+<area shape="rect" id="node2" href="$classmusicxml_1_1Music__xml__node.html" title="musicxml.Music_xml_node" alt="" coords="39,80,219,107"/>
+<area shape="rect" id="node3" href="$classmusicxml_1_1Xml__node.html" title="musicxml.Xml_node" alt="" coords="59,5,199,32"/>
+</map>

@@ -797,12 +797,15 @@ class Lyrics:
 
     def print_ly (self, printer):
         printer.dump (self.ly_expression ())
+	printer.newline()
+	printer.dump ('}')
+	printer.newline()
 
     def ly_expression (self):
         lstr = "\lyricmode {\set ignoreMelismata = ##t"
         for l in self.lyrics_syllables:
             lstr += l
-        lstr += "\n}"
+        #lstr += "\n}"
         return lstr
 
 class Header:
@@ -895,7 +898,7 @@ class Paper:
             printer.newline ()
         printer.dump ('\\paper {')
         printer.newline ()
-	printer.dump ("markup-system-spacing #'padding = #1")
+	printer.dump ("markup-system-spacing #'padding = #2")
 	printer.newline ()
         self.print_length_field (printer, "paper-width", self.page_width)
         self.print_length_field (printer, "paper-height", self.page_height)
@@ -2113,6 +2116,7 @@ class StaffGroup:
         for c in self.children:
             if c:
                 c.print_ly (printer)
+	#Intention: I want to put the content of new StaffGroup in angled brackets (<< >>)
 	#printer.dump ("test")# test is printed twice at the end of a staffgroup with two staves.
         #printer ("test") # test is printed twice at the end of a staffgroup with two staves.
 
@@ -2142,7 +2146,15 @@ class StaffGroup:
             self.print_ly_context_mods (printer)
             for m in self.context_modifications:
                 printer.dump (m)
-            printer.dump ("}")
+            printer.dump ("} <<")
+	    printer.newline ()
+	#print a single << after StaffGroup only when the with-block is not needed.
+	#This doesn't work. << is printed before and after StaffGroup!
+	#else:
+	#    printer.dump (" <<")
+	#prints loads off << before and after StaffGroup and before \set Staff.instrumentName
+	#elif not needs_with:
+	#    printer.dump (" <<")	
 
     def print_chords(self, printer):
         try:
@@ -2165,14 +2177,45 @@ class StaffGroup:
             return
 
     def print_ly (self, printer):
+	#prints two << before a StaffGroup, one after a StaffGroup and one before each \new Staff
         #printer.dump("<<")
 	#printer.newline ()
         self.print_chords(printer)
         self.print_fretboards(printer)
-        if self.stafftype:
-            printer.dump("\\new %s" % self.stafftype)
+	if self.stafftype:
+	    printer.dump ("\\new %s" % self.stafftype)
 	    printer.dump ("<<")
-            printer.newline()
+	    printer.newline ()
+	# if there is a width-block << should not be printed after StaffGroup but after the width-block
+	# this seems to work. It prints \new StaffGroup \with{} <<:
+#        if self.stafftype == "StaffGroup" and self.print_ly_overrides:
+	    #prints a new line before each new staff type, e.g. before \new StaffGroup and \new Staff...
+	    #printer.newline ()		
+#            printer.dump("\\new %s" % self.stafftype)
+	    #self.print_ly_overrides (printer)
+	    #prints a << and a new line after each new staff type.
+	   # printer.dump ("<<")
+           # printer.newline()
+	# print a << after all other staff types:
+	# can't use "else:" because then we get a '\new None' staff type in LilyPond...
+#	elif self.stafftype == "StaffGroup":
+#	    printer.dump ("\\new %s" % self.stafftype)
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# << should be printed directly after StaffGroups without a with-block:
+	# this doesn't work:
+#	elif self.stafftype == "StaffGroup" and not self.print_ly_overrides:
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# this is bullshit:
+#	elif self.stafftype == "StaffGroup" and self.stafftype == "Staff":
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# this prints \new Staff << for every staff in the score:
+#	elif self.stafftype:
+#	    printer.dump ("\\new %s" % self.stafftype)
+#	    printer.dump ("<<")
+#	    printer.newline ()	
         self.print_ly_overrides (printer)
         #printer.dump ("<<")
         #printer.newline ()
@@ -2354,6 +2397,7 @@ class Score:
         self.create_midi = get_create_midi()
         printer.dump("\\score {")
         printer.newline ()
+	#prints opening <<:
 	printer.dump ('<<')
 	printer.newline ()
         if self.contents:
