@@ -1,7 +1,0 @@
-<map id="musicexp.MusicWrapper" name="musicexp.MusicWrapper">
-<area shape="rect" id="node3" href="$classmusicexp_1_1ModeChangingMusicWrapper.html" title="musicexp.ModeChangingMusic\lWrapper" alt="" coords="385,5,589,47"/>
-<area shape="rect" id="node4" href="$classmusicexp_1_1RelativeMusic.html" title="musicexp.RelativeMusic" alt="" coords="405,71,570,98"/>
-<area shape="rect" id="node5" href="$classmusicexp_1_1ShiftDurations.html" title="musicexp.ShiftDurations" alt="" coords="405,122,570,149"/>
-<area shape="rect" id="node6" href="$classmusicexp_1_1TimeScaledMusic.html" title="musicexp.TimeScaledMusic" alt="" coords="394,173,581,199"/>
-<area shape="rect" id="node2" href="$classmusicexp_1_1Music.html" title="musicexp.Music" alt="" coords="5,97,123,123"/>
-</map>

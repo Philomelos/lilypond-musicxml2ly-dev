@@ -1100,9 +1100,13 @@ def musicxml_tremolo_to_lily_event(mxl_event):
     ev = musicexp.TremoloEvent()
     txt = mxl_event.get_text()
     if txt:
-      ev.bars = txt
+      ev.strokes = txt
     else:
-      ev.bars = "3"
+      # This is supposed to be a default for empty tremolo elements
+      # TODO: Add empty tremolo element to test cases in tremolo.xml
+      # TODO: Test empty tremolo element
+      # TODO: Consideration: Is 3 really a reasonable default?
+      ev.strokes = "3"
     return ev
 
 def musicxml_falloff_to_lily_event(mxl_event):
@@ -2791,12 +2795,13 @@ If the given filename is -, musicxml2ly reads from the command line.
                  action="help",
                  help=_("show this help and exit"))
 
-    p.version = ('''%prog (dev) v0.2.40\n\n'''
+    p.version = ('''%prog (dev) v0.2.41\n\n'''
 + 
-_ ("""Copyright (c) 2005--2011 by
+_ ("""Copyright (c) 2005--2015 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
     Jan Nieuwenhuizen <janneke@gnu.org> and
     Reinhold Kainhofer <reinhold@kainhofer.com>
+    Patrick L. Schmidt <pls@philomelos.net>
 """
 + 
 """
@@ -3071,8 +3076,7 @@ def update_layout_information():
 
 def print_ly_preamble(printer, filename):
     printer.dump_version()
-#    printer.print_verbatim('%% automatically converted by musicxml2ly from %s\n' % filename)
-    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.40\n')
+    printer.print_verbatim('% automatically converted by philomelos musicxml2ly v0.2.41\n')
     printer.newline()
     printer.dump(r'\pointAndClickOff')
     printer.newline()

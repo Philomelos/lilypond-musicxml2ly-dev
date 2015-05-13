@@ -16,6 +16,7 @@ from rational import Rational
 previous_pitch = None
 relative_pitches = False
 whatOrnament = ""
+ly_dur = None # stores lilypond durations
 
 def escape_instrument_string (input_string):
     retstring = string.replace (input_string, "\"", "\\\"")
@@ -57,7 +58,7 @@ class Output_printer(object):
         self._file = file
 
     def dump_version (self):
-        self.print_verbatim ('\\version "2.19.3"')
+        self.print_verbatim ('\\version "2.19.15"')
         self.newline ()
 
     def get_indent (self):
@@ -146,19 +147,19 @@ class Output_printer(object):
 
 
 class Duration:
-    def __init__ (self):
+    def __init__(self):
         self.duration_log = 0
         self.dots = 0
-        self.factor = Rational (1)
+        self.factor = Rational(1)
 
-    def lisp_expression (self):
+    def lisp_expression(self):
         return '(ly:make-duration %d %d %d %d)' % (self.duration_log,
                              self.dots,
-                             self.factor.numerator (),
-                             self.factor.denominator ())
+                             self.factor.numerator(),
+                             self.factor.denominator())
 
-
-    def ly_expression (self, factor=None, scheme_mode=False):
+    def ly_expression(self, factor=None, scheme_mode=False):
+        global ly_dur # stores lilypond durations
         if not factor:
             factor = self.factor
 
@@ -167,47 +168,48 @@ class Duration:
                 longer_dict = {-1: "breve", -2: "longa"}
             else:
                 longer_dict = {-1: "\\breve", -2: "\\longa"}
-            str = longer_dict.get (self.duration_log, "1")
+            str = longer_dict.get(self.duration_log, "1")
         else:
             str = '%d' % (1 << self.duration_log)
         str += '.' * self.dots
 
-        if factor <> Rational (1, 1):
-            if factor.denominator () <> 1:
-                str += '*%d/%d' % (factor.numerator (), factor.denominator ())
+        if factor <> Rational(1, 1):
+            if factor.denominator() <> 1:
+                str += '*%d/%d' % (factor.numerator(), factor.denominator())
             else:
-                str += '*%d' % factor.numerator ()
+                str += '*%d' % factor.numerator()
 
+        ly_dur = int(str)
         return str
 
-    def print_ly (self, outputter):
-        str = self.ly_expression (self.factor / outputter.duration_factor ())
-        outputter.print_duration_string (str)
+    def print_ly(self, outputter):
+        str = self.ly_expression(self.factor / outputter.duration_factor())
+        outputter.print_duration_string(str)
 
     def __repr__(self):
         return self.ly_expression()
 
-    def copy (self):
-        d = Duration ()
+    def copy(self):
+        d = Duration()
         d.dots = self.dots
         d.duration_log = self.duration_log
         d.factor = self.factor
         return d
 
-    def get_length (self):
+    def get_length(self):
         dot_fact = Rational((1 << (1 + self.dots)) - 1,
                              1 << self.dots)
 
-        log = abs (self.duration_log)
+        log = abs(self.duration_log)
         dur = 1 << log
         if self.duration_log < 0:
-            base = Rational (dur)
+            base = Rational(dur)
         else:
-            base = Rational (1, dur)
+            base = Rational(1, dur)
 
         return base * dot_fact * self.factor
 
-def set_create_midi (option):
+def set_create_midi(option):
     """
     Implement the midi command line option '-m' and '--midi'.
     If True, add midi-block to .ly file (see L{musicexp.Score.print_ly}).
@@ -231,17 +233,17 @@ def get_create_midi ():
         return False
 
 # implement the command line option '--transpose'
-def set_transpose (option):
+def set_transpose(option):
     global transpose_option
     transpose_option = option
 
-def get_transpose (optType):
+def get_transpose(optType):
     try:
 	if(optType == "string"):
 	    return '\\transpose c %s' % transpose_option
 	elif(optType == "integer"):
 	    p = generic_tone_to_pitch(transpose_option)
-	    return p.semitones ()
+	    return p.semitones()
     except:
         if(optType == "string"):
 	    return ""
@@ -249,22 +251,22 @@ def get_transpose (optType):
 	    return 0
 
 # implement the command line option '--tab-clef'
-def set_tab_clef (option):
+def set_tab_clef(option):
     global tab_clef_option
     tab_clef_option = option
 
-def get_tab_clef ():
+def get_tab_clef():
     try:
         return ("tab", tab_clef_option)[tab_clef_option == "tab" or tab_clef_option == "moderntab"]
     except:
         return "tab"
 
 # definitions of the command line option '--string-numbers'
-def set_string_numbers (option):
+def set_string_numbers(option):
     global string_numbers_option
     string_numbers_option = option
 
-def get_string_numbers ():
+def get_string_numbers():
     try:
         return ("t", string_numbers_option)[string_numbers_option == "t" or string_numbers_option == "f"]
     except:
@@ -835,32 +837,32 @@ class Header:
             printer.dump(value)
 	printer.newline()
 
-    def print_ly (self, printer):
-        printer.dump ("\header {")
-        printer.newline ()
-        for (k, v) in self.header_fields.items ():
+    def print_ly(self, printer):
+        printer.dump("\header {")
+        printer.newline()
+        for (k, v) in self.header_fields.items():
             if v:
                self.format_header_strings(k, v, printer)
-	#printer.newline ()
-	printer.dump (r'tagline = \markup {')
-	printer.newline ()
-	printer.dump (r'  \center-column {')
-	printer.newline ()
-	printer.dump ('\line {"Music engraving by LilyPond " $(lilypond-version) | \with-url #"http://www.lilypond.org" {www.lilypond.org}}')
-	printer.newline ()
-	printer.dump ('\line {\with-url #"https://philomelos.net" {\with-color #grey {Learn, teach and share music on https://philomelos.net}}}')
-	printer.newline ()
-	printer.dump ('}')
-	printer.newline ()
-	printer.dump ('}')
-	printer.newline ()
-        printer.dump ("}")
-        printer.newline ()
-        printer.newline ()
+	#printer.newline()
+	printer.dump(r'tagline = \markup {')
+	printer.newline()
+	printer.dump(r'  \center-column {')
+	printer.newline()
+	printer.dump('\line {"Music engraving by LilyPond " $(lilypond-version) | \with-url #"http://www.lilypond.org" {www.lilypond.org}}')
+	printer.newline()
+	printer.dump('\line {\with-url #"https://philomelos.net" {\with-color #grey {Learn, teach and share music on https://philomelos.net}}}')
+	printer.newline()
+	printer.dump('}')
+	printer.newline()
+	printer.dump('}')
+	printer.newline()
+        printer.dump("}")
+        printer.newline()
+        printer.newline()
 
 
 class Paper:
-    def __init__ (self):
+    def __init__(self):
         self.global_staff_size = -1
         # page size
         self.page_width = -1
@@ -1605,15 +1607,36 @@ class ChordNameEvent (Event):
         return value
 
 
-class TremoloEvent (ArticulationEvent):
-    def __init__ (self):
-        Event.__init__ (self)
-        self.bars = 0
+class TremoloEvent(ArticulationEvent):
+    def __init__(self):
+        Event.__init__(self)
+        self.strokes = 0
 
-    def ly_expression (self):
+    def ly_expression(self):
         str = ''
-        if self.bars and self.bars > 0:
-            str += ':%s' % (2 ** (2 + string.atoi (self.bars)))
+        if self.strokes and int(self.strokes) > 0:
+            # ly_dur is a global variable defined in class Duration
+            # ly_dur stores the value of the reciprocal values of notes
+            # ly_dur is used here to check the current note duration
+            # if it is smaller than an 8th note, e.g.
+            # quarter, half and whole notes,
+            # `:(2 ** (2 + number of tremolo strokes)'
+            # should be appended to the pitch and duration, e.g.
+            # 1 stroke: `c4:8' or `c2:8' or `c1:8'
+            # 2 strokes: `c4:16' or `c2:16' or `c1:16'
+            # ...
+            # else (if ly_dur is equal to or greater than 8):
+            # we need to make sure that the tremolo value that is to
+            # be appended to the pitch and duration is twice the
+            # duration (if there is only one tremolo stroke.
+            # Each additional stroke doubles the tremolo value, e.g.:
+            # 1 stroke: `c8:16', `c16:32', `c32:64', ...
+            # 2 strokes: `c8:32', `c16:64', `c32:128', ...
+            # ... 
+            if ly_dur < 8:
+                str += ':%s' % (2 ** (2 + int(self.strokes)))
+            else:
+                str += ':%s' % (2 ** int((math.log(ly_dur, 2)) + int(self.strokes)))
         return str
 
 class BendEvent (ArticulationEvent):

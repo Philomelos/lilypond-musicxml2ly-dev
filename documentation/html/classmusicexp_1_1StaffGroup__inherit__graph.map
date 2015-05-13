@@ -1,6 +1,0 @@
-<map id="musicexp.StaffGroup" name="musicexp.StaffGroup">
-<area shape="rect" id="node2" href="$classmusicexp_1_1Staff.html" title="musicexp.Staff" alt="" coords="200,80,311,107"/>
-<area shape="rect" id="node3" href="$classmusicexp_1_1DrumStaff.html" title="musicexp.DrumStaff" alt="" coords="5,155,148,181"/>
-<area shape="rect" id="node4" href="$classmusicexp_1_1RhythmicStaff.html" title="musicexp.RhythmicStaff" alt="" coords="172,155,339,181"/>
-<area shape="rect" id="node5" href="$classmusicexp_1_1TabStaff.html" title="musicexp.TabStaff" alt="" coords="363,155,495,181"/>
-</map>

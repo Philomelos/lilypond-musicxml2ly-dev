@@ -1,8 +1,0 @@
-<map id="musicxml.Measure_element" name="musicxml.Measure_element">
-<area shape="rect" id="node4" href="$classmusicxml_1_1Attributes.html" title="musicxml.Attributes" alt="" coords="5,229,144,256"/>
-<area shape="rect" id="node5" href="$classmusicxml_1_1Barline.html" title="musicxml.Barline" alt="" coords="168,229,291,256"/>
-<area shape="rect" id="node6" href="$classmusicxml_1_1Note.html" title="musicxml.Note" alt="" coords="315,229,426,256"/>
-<area shape="rect" id="node7" href="$classmusicxml_1_1Partial.html" title="musicxml.Partial" alt="" coords="450,229,569,256"/>
-<area shape="rect" id="node2" href="$classmusicxml_1_1Music__xml__node.html" title="musicxml.Music_xml_node" alt="" coords="210,80,390,107"/>
-<area shape="rect" id="node3" href="$classmusicxml_1_1Xml__node.html" title="musicxml.Xml_node" alt="" coords="230,5,370,32"/>
-</map>

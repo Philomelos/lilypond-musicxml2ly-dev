@@ -1,7 +1,0 @@
-<map id="musicexp.NestedMusic" name="musicexp.NestedMusic">
-<area shape="rect" id="node3" href="$classmusicexp_1_1ChordEvent.html" title="musicexp.ChordEvent" alt="" coords="397,5,547,32"/>
-<area shape="rect" id="node4" href="$classmusicexp_1_1FiguredBassEvent.html" title="musicexp.FiguredBassEvent" alt="" coords="377,56,567,83"/>
-<area shape="rect" id="node5" href="$classmusicexp_1_1FretBoardEvent.html" title="musicexp.FretBoardEvent" alt="" coords="385,107,559,133"/>
-<area shape="rect" id="node6" href="$classmusicexp_1_1SequentialMusic.html" title="musicexp.SequentialMusic" alt="" coords="383,157,561,184"/>
-<area shape="rect" id="node2" href="$classmusicexp_1_1Music.html" title="musicexp.Music" alt="" coords="5,81,123,108"/>
-</map>
