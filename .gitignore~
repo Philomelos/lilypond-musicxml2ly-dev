@@ -1,0 +1,9 @@
+*.pyc
+*.ly
+*.ly~
+*.pdf
+*.tiff
+*.png
+*.xml
+lilylib.py
+rational.py

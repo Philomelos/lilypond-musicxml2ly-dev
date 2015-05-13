@@ -5,6 +5,8 @@ import string
 import re
 import math
 import lilylib as ly
+import warnings
+import utilities
 
 _ = ly._
 
@@ -14,6 +16,7 @@ from rational import Rational
 previous_pitch = None
 relative_pitches = False
 whatOrnament = ""
+ly_dur = None # stores lilypond durations
 
 def escape_instrument_string (input_string):
     retstring = string.replace (input_string, "\"", "\\\"")
@@ -36,7 +39,7 @@ class Output_stack_element:
         o.factor = self.factor
         return o
 
-class Output_printer:
+class Output_printer(object):
     """
     A class that takes care of formatting (eg.: indenting) a
     Music expression as a .ly file.
@@ -55,7 +58,7 @@ class Output_printer:
         self._file = file
 
     def dump_version (self):
-        self.print_verbatim ('\\version "2.15.95"')
+        self.print_verbatim ('\\version "2.19.15"')
         self.newline ()
 
     def get_indent (self):
@@ -132,10 +135,10 @@ class Output_printer:
             self._skipspace = False
             self.unformatted_output (str)
         else:
-            words = string.split (str)
+            # Avoid splitting quoted strings (e.g. "1. Wie") when indenting.
+            words = utilities.split_string_and_preserve_doublequoted_substrings(str)
             for w in words:
                 self.add_word (w)
-
 
     def close (self):
         self.newline ()
@@ -144,19 +147,19 @@ class Output_printer:
 
 
 class Duration:
-    def __init__ (self):
+    def __init__(self):
         self.duration_log = 0
         self.dots = 0
-        self.factor = Rational (1)
+        self.factor = Rational(1)
 
-    def lisp_expression (self):
+    def lisp_expression(self):
         return '(ly:make-duration %d %d %d %d)' % (self.duration_log,
                              self.dots,
-                             self.factor.numerator (),
-                             self.factor.denominator ())
+                             self.factor.numerator(),
+                             self.factor.denominator())
 
-
-    def ly_expression (self, factor=None, scheme_mode=False):
+    def ly_expression(self, factor=None, scheme_mode=False):
+        global ly_dur # stores lilypond durations
         if not factor:
             factor = self.factor
 
@@ -165,47 +168,48 @@ class Duration:
                 longer_dict = {-1: "breve", -2: "longa"}
             else:
                 longer_dict = {-1: "\\breve", -2: "\\longa"}
-            str = longer_dict.get (self.duration_log, "1")
+            str = longer_dict.get(self.duration_log, "1")
         else:
             str = '%d' % (1 << self.duration_log)
         str += '.' * self.dots
 
-        if factor <> Rational (1, 1):
-            if factor.denominator () <> 1:
-                str += '*%d/%d' % (factor.numerator (), factor.denominator ())
+        if factor <> Rational(1, 1):
+            if factor.denominator() <> 1:
+                str += '*%d/%d' % (factor.numerator(), factor.denominator())
             else:
-                str += '*%d' % factor.numerator ()
+                str += '*%d' % factor.numerator()
 
+        ly_dur = int(str)
         return str
 
-    def print_ly (self, outputter):
-        str = self.ly_expression (self.factor / outputter.duration_factor ())
-        outputter.print_duration_string (str)
+    def print_ly(self, outputter):
+        str = self.ly_expression(self.factor / outputter.duration_factor())
+        outputter.print_duration_string(str)
 
     def __repr__(self):
         return self.ly_expression()
 
-    def copy (self):
-        d = Duration ()
+    def copy(self):
+        d = Duration()
         d.dots = self.dots
         d.duration_log = self.duration_log
         d.factor = self.factor
         return d
 
-    def get_length (self):
+    def get_length(self):
         dot_fact = Rational((1 << (1 + self.dots)) - 1,
                              1 << self.dots)
 
-        log = abs (self.duration_log)
+        log = abs(self.duration_log)
         dur = 1 << log
         if self.duration_log < 0:
-            base = Rational (dur)
+            base = Rational(dur)
         else:
-            base = Rational (1, dur)
+            base = Rational(1, dur)
 
         return base * dot_fact * self.factor
 
-def set_create_midi (option):
+def set_create_midi(option):
     """
     Implement the midi command line option '-m' and '--midi'.
     If True, add midi-block to .ly file (see L{musicexp.Score.print_ly}).
@@ -229,17 +233,17 @@ def get_create_midi ():
         return False
 
 # implement the command line option '--transpose'
-def set_transpose (option):
+def set_transpose(option):
     global transpose_option
     transpose_option = option
 
-def get_transpose (optType):
+def get_transpose(optType):
     try:
 	if(optType == "string"):
 	    return '\\transpose c %s' % transpose_option
 	elif(optType == "integer"):
 	    p = generic_tone_to_pitch(transpose_option)
-	    return p.semitones ()
+	    return p.semitones()
     except:
         if(optType == "string"):
 	    return ""
@@ -247,22 +251,22 @@ def get_transpose (optType):
 	    return 0
 
 # implement the command line option '--tab-clef'
-def set_tab_clef (option):
+def set_tab_clef(option):
     global tab_clef_option
     tab_clef_option = option
 
-def get_tab_clef ():
+def get_tab_clef():
     try:
         return ("tab", tab_clef_option)[tab_clef_option == "tab" or tab_clef_option == "moderntab"]
     except:
         return "tab"
 
 # definitions of the command line option '--string-numbers'
-def set_string_numbers (option):
+def set_string_numbers(option):
     global string_numbers_option
     string_numbers_option = option
 
-def get_string_numbers ():
+def get_string_numbers():
     try:
         return ("t", string_numbers_option)[string_numbers_option == "t" or string_numbers_option == "f"]
     except:
@@ -795,35 +799,70 @@ class Lyrics:
 
     def print_ly (self, printer):
         printer.dump (self.ly_expression ())
+	printer.newline()
+	printer.dump ('}')
+	printer.newline()
 
     def ly_expression (self):
-        lstr = "\lyricmode {\n  "
+        lstr = "\lyricmode {\set ignoreMelismata = ##t"
         for l in self.lyrics_syllables:
             lstr += l
-        lstr += "\n}"
+        #lstr += "\n}"
         return lstr
 
-
 class Header:
+
     def __init__ (self):
         self.header_fields = {}
+
     def set_field (self, field, value):
         self.header_fields[field] = value
 
-    def print_ly (self, printer):
-        printer.dump ("\header {")
-        printer.newline ()
-        for (k, v) in self.header_fields.items ():
+    def format_header_strings(self, key, value, printer):
+        printer.dump(key + ' = ')
+
+        # If a header item contains a line break, it is segmented. The
+        # substrings are formatted with the help of \markup, using
+        # \column and \line.
+        if '\n' in value: 
+            value = value.replace('"', '')
+            printer.dump(r'\markup \column {')
+            substrings = value.split('\n')
+            for s in substrings:
+                printer.newline()
+                printer.dump(r'\line { "' + s + '"}')
+            printer.dump('}')
+            printer.newline()
+        else:
+            printer.dump(value)
+	printer.newline()
+
+    def print_ly(self, printer):
+        printer.dump("\header {")
+        printer.newline()
+        for (k, v) in self.header_fields.items():
             if v:
-                printer.dump ('%s = %s' % (k, v))
-                printer.newline ()
-        printer.dump ("}")
-        printer.newline ()
-        printer.newline ()
+               self.format_header_strings(k, v, printer)
+	#printer.newline()
+	printer.dump(r'tagline = \markup {')
+	printer.newline()
+	printer.dump(r'  \center-column {')
+	printer.newline()
+	printer.dump('\line {"Music engraving by LilyPond " $(lilypond-version) | \with-url #"http://www.lilypond.org" {www.lilypond.org}}')
+	printer.newline()
+	printer.dump('\line {\with-url #"https://philomelos.net" {\with-color #grey {Learn, teach and share music on https://philomelos.net}}}')
+	printer.newline()
+	printer.dump('}')
+	printer.newline()
+	printer.dump('}')
+	printer.newline()
+        printer.dump("}")
+        printer.newline()
+        printer.newline()
 
 
 class Paper:
-    def __init__ (self):
+    def __init__(self):
         self.global_staff_size = -1
         # page size
         self.page_width = -1
@@ -839,17 +878,30 @@ class Paper:
         self.top_system_distance = -1
         self.indent = 0
         self.short_indent = 0
+        self.instrument_names = []
 
     def print_length_field (self, printer, field, value):
         if value >= 0:
             printer.dump ("%s = %s\\cm" % (field, value))
             printer.newline ()
+
+    def get_longest_instrument_name(self):
+        result = ''
+        for name in self.instrument_names:
+            lines = name.split('\n')
+            for line in lines:
+                if len(line) > len(result):
+                    result = line
+        return result
+
     def print_ly (self, printer):
         if self.global_staff_size > 0:
             printer.dump ('#(set-global-staff-size %s)' % self.global_staff_size)
             printer.newline ()
         printer.dump ('\\paper {')
         printer.newline ()
+	printer.dump ("markup-system-spacing #'padding = #2")
+	printer.newline ()
         self.print_length_field (printer, "paper-width", self.page_width)
         self.print_length_field (printer, "paper-height", self.page_height)
         self.print_length_field (printer, "top-margin", self.top_margin)
@@ -864,7 +916,7 @@ class Paper:
         # TODO: Compute the indentation with the instrument name lengths
 
         # TODO: font width ?
-        char_per_cm = 120/(self.page_width-self.right_margin-self.left_margin)
+        char_per_cm = (len(self.get_longest_instrument_name()) * 13) / self.page_width
         if (self.indent != 0):
             self.print_length_field (printer, "indent", self.indent/char_per_cm)
         if (self.short_indent != 0):
@@ -1100,7 +1152,7 @@ class PedalEvent (SpanEvent):
 
 class TextSpannerEvent (SpanEvent):
     def print_before_note (self, printer):
-        if self.style=="wave":
+        if hasattr(self, 'style') and self.style=="wave":
             printer.dump("\once \override TextSpanner #'style = #'trill")
         try:
             x = {-1:'\\textSpannerDown', 0:'\\textSpannerNeutral', 1: '\\textSpannerUp'}.get(self.force_direction, '')
@@ -1113,13 +1165,14 @@ class TextSpannerEvent (SpanEvent):
 
     def ly_expression (self):
         global whatOrnament
-        if self.style=="ignore": return ""
+        if hasattr(self, 'style') and self.style=="ignore":
+            return ""
         # if self.style=="wave":
         if whatOrnament == "wave":
             return {-1: '\\startTextSpan',
                     1:'\\stopTextSpan'}.get (self.span_direction, '')
         else:
-            if self.style=="stop" and whatOrnament != "trill": return ""
+            if hasattr(self, 'style') and self.style=="stop" and whatOrnament != "trill": return ""
             return {-1: '\\startTrillSpan',
                     1:'\\stopTrillSpan'}.get (self.span_direction, '')
 
@@ -1238,6 +1291,7 @@ class DynamicsEvent (Event):
     def __init__ (self):
         Event.__init__ (self)
         self.type = None
+        self.force_direction = 0
     def wait_for_note (self):
         return True
     def ly_expression (self):
@@ -1282,9 +1336,30 @@ class TextEvent (Event):
         self.force_direction = None
         self.markup = ''
     def wait_for_note (self):
+	""" This is problematic: the lilypond-markup ^"text" 
+	requires wait_for_note to be true. Otherwise the
+	compilation will fail.  So we are forced to set return to True.
+	But in some cases this might lead to a wrong placement of the text.
+	In case of words like Allegro the text should be put in a '\tempo'-command.
+	In this case we don't want to wait for the next note.
+	In some other cases the text is supposed to be used in a '\mark\markup' construct.
+	We would not want to wait for the next note either.
+	There might be other problematic situations.
+	In the long run we should differentiate between various contexts in MusicXML, e.g.
+	the following markup should be interpreted as '\tempo "Allegretto"':
+		<direction placement="above">
+        	    <direction-type>
+          		<words>Allegretto</words>
+        	    </direction-type>
+        	    <sound tempo="120"/>
+      		</direction>
+	In the mean time arising problems have to be corrected manually after the conversion.
+	"""
         return True
 
     def direction_mod (self):
+	""" 1: placement="above"; -1: placement="below"; 0: no placement attribute. 
+	see musicxml_direction_to_indicator in musicxml2ly_conversion.py """
         return { 1: '^', -1: '_', 0: '-' }.get (self.force_direction, '-')
 
     def ly_expression (self):
@@ -1318,9 +1393,21 @@ class ShortArticulationEvent (ArticulationEvent):
             return ''
 
 class NoDirectionArticulationEvent (ArticulationEvent):
+
+    def is_breathing_sign(self):
+        return self.type == 'breathe'
+
+    def print_after_note(self, printer):
+        # The breathing sign should, according to current LilyPond
+        # praxis, be treated as an independent musical
+        # event. Consequently, it should be printed _after_ the note
+        # to which it is attached.
+        if self.is_breathing_sign():
+            printer.dump(r'\breathe')
+
     def ly_expression (self):
-        if self.type:
-            return '\\%s' % self.type
+        if self.type and not self.is_breathing_sign():
+             return '\\%s' % self.type
         else:
             return ''
 
@@ -1500,16 +1587,14 @@ class ChordNameEvent (Event):
     def add_modification (self, mod):
         self.modifications.append (mod)
     def ly_expression (self):
+
         if not self.root:
             return ''
         value = self.root.ly_expression ()
         if self.duration:
             value += self.duration.ly_expression ()
         if self.kind:
-            value += ":"
-            value += self.kind
-            if self.kind == "1.5":
-                value = "\\powerChords " + value
+            value = self.kind.format(value)
         # First print all additions/changes, and only afterwards all subtractions
         for m in self.modifications:
             if m.type == 1:
@@ -1522,15 +1607,36 @@ class ChordNameEvent (Event):
         return value
 
 
-class TremoloEvent (ArticulationEvent):
-    def __init__ (self):
-        Event.__init__ (self)
-        self.bars = 0
+class TremoloEvent(ArticulationEvent):
+    def __init__(self):
+        Event.__init__(self)
+        self.strokes = 0
 
-    def ly_expression (self):
+    def ly_expression(self):
         str = ''
-        if self.bars and self.bars > 0:
-            str += ':%s' % (2 ** (2 + string.atoi (self.bars)))
+        if self.strokes and int(self.strokes) > 0:
+            # ly_dur is a global variable defined in class Duration
+            # ly_dur stores the value of the reciprocal values of notes
+            # ly_dur is used here to check the current note duration
+            # if it is smaller than an 8th note, e.g.
+            # quarter, half and whole notes,
+            # `:(2 ** (2 + number of tremolo strokes)'
+            # should be appended to the pitch and duration, e.g.
+            # 1 stroke: `c4:8' or `c2:8' or `c1:8'
+            # 2 strokes: `c4:16' or `c2:16' or `c1:16'
+            # ...
+            # else (if ly_dur is equal to or greater than 8):
+            # we need to make sure that the tremolo value that is to
+            # be appended to the pitch and duration is twice the
+            # duration (if there is only one tremolo stroke.
+            # Each additional stroke doubles the tremolo value, e.g.:
+            # 1 stroke: `c8:16', `c16:32', `c32:64', ...
+            # 2 strokes: `c8:32', `c16:64', `c32:128', ...
+            # ... 
+            if ly_dur < 8:
+                str += ':%s' % (2 ** (2 + int(self.strokes)))
+            else:
+                str += ':%s' % (2 ** int((math.log(ly_dur, 2)) + int(self.strokes)))
         return str
 
 class BendEvent (ArticulationEvent):
@@ -1606,7 +1712,7 @@ class SkipEvent (RhythmicEvent):
 class NoteEvent(RhythmicEvent):
     def  __init__ (self):
         RhythmicEvent.__init__ (self)
-        self.pitch = None
+        #self.pitch = None
         self.drum_type = None
         self.cautionary = False
         self.forced_accidental = False
@@ -2003,6 +2109,7 @@ class StaffGroup:
         self.stafftype = command
         self.id = None
         self.instrument_name = None
+        self.sound = None
         self.short_instrument_name = None
         self.symbol = None
         self.spanbar = None
@@ -2032,6 +2139,9 @@ class StaffGroup:
         for c in self.children:
             if c:
                 c.print_ly (printer)
+	#Intention: I want to put the content of new StaffGroup in angled brackets (<< >>)
+	#printer.dump ("test")# test is printed twice at the end of a staffgroup with two staves.
+        #printer ("test") # test is printed twice at the end of a staffgroup with two staves.
 
     def needs_with (self):
         needs_with = False
@@ -2040,6 +2150,7 @@ class StaffGroup:
         needs_with |= self.short_instrument_name != None
         needs_with |= (self.symbol != None) and (self.symbol != "bracket")
         return needs_with
+
     def print_ly_context_mods (self, printer):
         if self.instrument_name or self.short_instrument_name:
             printer.dump ("\\consists \"Instrument_name_engraver\"")
@@ -2058,7 +2169,15 @@ class StaffGroup:
             self.print_ly_context_mods (printer)
             for m in self.context_modifications:
                 printer.dump (m)
-            printer.dump ("}")
+            printer.dump ("} <<")
+	    printer.newline ()
+	#print a single << after StaffGroup only when the with-block is not needed.
+	#This doesn't work. << is printed before and after StaffGroup!
+	#else:
+	#    printer.dump (" <<")
+	#prints loads off << before and after StaffGroup and before \set Staff.instrumentName
+	#elif not needs_with:
+	#    printer.dump (" <<")	
 
     def print_chords(self, printer):
         try:
@@ -2080,28 +2199,76 @@ class StaffGroup:
         except TypeError:
             return
 
-
     def print_ly (self, printer):
-        printer.dump("<<\n")
+	#prints two << before a StaffGroup, one after a StaffGroup and one before each \new Staff
+        #printer.dump("<<")
+	#printer.newline ()
         self.print_chords(printer)
         self.print_fretboards(printer)
-        if self.stafftype:
-            printer.dump ("\\new %s" % self.stafftype)
+	if self.stafftype:
+	    printer.dump ("\\new %s" % self.stafftype)
+	    printer.dump ("<<")
+	    printer.newline ()
+	# if there is a width-block << should not be printed after StaffGroup but after the width-block
+	# this seems to work. It prints \new StaffGroup \with{} <<:
+#        if self.stafftype == "StaffGroup" and self.print_ly_overrides:
+	    #prints a new line before each new staff type, e.g. before \new StaffGroup and \new Staff...
+	    #printer.newline ()		
+#            printer.dump("\\new %s" % self.stafftype)
+	    #self.print_ly_overrides (printer)
+	    #prints a << and a new line after each new staff type.
+	   # printer.dump ("<<")
+           # printer.newline()
+	# print a << after all other staff types:
+	# can't use "else:" because then we get a '\new None' staff type in LilyPond...
+#	elif self.stafftype == "StaffGroup":
+#	    printer.dump ("\\new %s" % self.stafftype)
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# << should be printed directly after StaffGroups without a with-block:
+	# this doesn't work:
+#	elif self.stafftype == "StaffGroup" and not self.print_ly_overrides:
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# this is bullshit:
+#	elif self.stafftype == "StaffGroup" and self.stafftype == "Staff":
+#	    printer.dump ("<<")
+#	    printer.newline ()
+	# this prints \new Staff << for every staff in the score:
+#	elif self.stafftype:
+#	    printer.dump ("\\new %s" % self.stafftype)
+#	    printer.dump ("<<")
+#	    printer.newline ()	
         self.print_ly_overrides (printer)
-        printer.dump ("<<")
-        printer.newline ()
+        #printer.dump ("<<")
+        #printer.newline ()
         if self.stafftype and self.instrument_name:
             printer.dump ("\\set %s.instrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.instrument_name)))
-            printer.newline ()
+            #printer.newline ()
         if self.stafftype and self.short_instrument_name:
             printer.dump ("\\set %s.shortInstrumentName = %s" % (self.stafftype,
                     escape_instrument_string (self.short_instrument_name)))
             printer.newline ()
+        if self.sound:
+            printer.dump(
+                r'\set {stafftype}.midiInstrument = #"{sound}"'.format(
+                    stafftype=self.stafftype, sound=self.sound))
         self.print_ly_contents (printer)
         printer.newline ()
-        printer.dump (">>")
-        printer.dump (">>")
+# This is a crude hack: In scores with staff groups the closing angled brackets are not printed.
+# That's why I added the following two lines. I couldn't find a proper solution. This won't work with scores several staff groups!!!
+	if self.stafftype == "StaffGroup":
+	    printer.dump (">>")
+        #printer.dump (">>")
+        #printer.dump (">>")
+	#printer.newline ()
+	#printer.dump ("test") #test is printed 4 times in a staffgroup with two staves: once at the end of each staff and twice at the end of the staffgroup. That's not what we want!
+    #printer.dump ("test") NameError: name 'printer' is not defined	
+
+#test    
+#    def print_staffgroup_closing_brackets (self, printer): #test see class Staff / Score. 
+#	printer.dump ("test")
 
 
 class Staff (StaffGroup):
@@ -2111,11 +2278,13 @@ class Staff (StaffGroup):
         self.part = None
         self.voice_command = "Voice"
         self.substafftype = None
+        self.sound = None 
 
     def needs_with (self):
         return False
 
     def print_ly_context_mods (self, printer):
+	#printer.dump ("test") #does nothing.
         pass
 
     def print_ly_contents (self, printer):
@@ -2124,6 +2293,8 @@ class Staff (StaffGroup):
         sub_staff_type = self.substafftype
         if not sub_staff_type:
             sub_staff_type = self.stafftype
+	#printer.dump ("test") #prints test in each staff after the definitions of the instrument name and before the definition of the contexts.
+        printer.newline()
 
         for [staff_id, voices] in self.part_information:
             # now comes the real staff definition:
@@ -2132,27 +2303,46 @@ class Staff (StaffGroup):
             else:
                 printer ('\\context %s << ' % sub_staff_type)
             printer.newline ()
+            printer.dump("\mergeDifferentlyDottedOn\mergeDifferentlyHeadedOn")
+            printer.newline()
             n = 0
             nr_voices = len (voices)
             for [v, lyrics, figuredbass, chordnames, fretboards] in voices:
                 n += 1
                 voice_count_text = ''
                 if nr_voices > 1:
+                    """ 
+The next line contains a bug: The voices might not appear in numerical order! Some voices might be missing e.g. if the xml file contains only voice one, three and four, this would result in: \voiceOne, \voiceTwo and \voiceThree. This causes wrong stem directions and collisions. 
+                    """
                     voice_count_text = {1: ' \\voiceOne', 2: ' \\voiceTwo', 3: ' \\voiceThree'}.get (n, ' \\voiceFour')
                 printer ('\\context %s = "%s" {%s %s \\%s }' % (self.voice_command, v, get_transpose ("string"), voice_count_text, v))
                 printer.newline ()
+                lyrics_id = 1  
                 for l in lyrics:
-                    printer ('\\new Lyrics \\lyricsto "%s" \\%s' % (v, l))
+                    printer ('\\new Lyrics \\lyricsto "%s" { \\set stanza = "%s." \\%s }' % (v, lyrics_id, l))
+		    lyrics_id += 1
                     printer.newline()
                 if figuredbass:
-                    printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))
+                    printer ('\context FiguredBass = "%s" \\%s' % (figuredbass, figuredbass))		
             printer ('>>')
+	    #printer.dump ("test") #prints test after each definition of a context.
+	    #printer.newline ()
+	#printer.dump ("test") #prints test after each definition of a context.
 
     def print_ly (self, printer):
         if self.part_information and len (self.part_information) > 1:
             self.stafftype = "PianoStaff"
             self.substafftype = "Staff"
+	    #printer.dump ('test')
         StaffGroup.print_ly (self, printer)
+	#StaffGroup.print_staffgroup_closing_brackets (self, printer) prints test after each definition of a staff
+	printer.dump ('>>')
+	#printer.dump ("test") #prints test after each definition of a context.
+	printer.newline ()
+	#StaffGroup.print_staffgroup_closing_brackets(self, printer) #prints test after each definition of a staff.
+    #printer.dump ("test")# NameError: name 'printer' is not defined
+    #StaffGroup.print_staffgroup_closing_brackets() #TypeError: unbound method print_staffgroup_closing_brackets() must be called with StaffGroup instance as first argument (got nothing instead)
+	
 
 class TabStaff (Staff):
     def __init__ (self, command="TabStaff"):
@@ -2188,6 +2378,10 @@ class RhythmicStaff (Staff):
     def __init__ (self, command="RhythmicStaff"):
         Staff.__init__ (self, command)
 
+#Test
+#def print_staffgroup_closing_brackets (self, printer): #test see class Score / class Staff
+#	printer.dump ("test")
+
 class Score:
     def __init__ (self):
 	"""
@@ -2212,6 +2406,9 @@ class Score:
 	@type tempo: String
 	"""
         self.tempo = tempo
+    #Test
+#    def print_staffgroup_closing_brackets (self, printer): #test see class Score / class Staff
+#	printer.dump ("test")
 
     def print_ly (self, printer):
 	"""
@@ -2220,15 +2417,35 @@ class Score:
 	@param printer: A printer given to display correctly the output.
 	@type printer: L{Output_printer<musicexp.Output_printer>}
 	"""
-        self.create_midi = get_create_midi ()
-        printer.dump ("\\score {")
+        self.create_midi = get_create_midi()
+        printer.dump("\\score {")
         printer.newline ()
+	#prints opening <<:
+	printer.dump ('<<')
+	printer.newline ()
         if self.contents:
-            self.contents.print_ly (printer)
+            self.contents.print_ly(printer)
+	    #printer.dump ("test") prints test once before the >> of the score block, independent of the existence of a staffgroup.
+	#if StaffGroup == False: # True or False: nothing happens.
+	#    printer.dump ('>>')
+	printer.dump ('>>')
+	printer.newline ()
+	#StaffGroup.print_staffgroup_closing_brackets(self, printer) #TypeError: unbound method print_staffgroup_closing_brackets() must be called with StaffGroup instance as first argument (got Score instance instead)
+        #print_staffgroup_closing_brackets(self, printer) #NameError: global name 'print_staffgroup_closing_brackets' is not defined. prints test once before the >> of the score block, independent of the existence of a staffgroup.
         printer.dump ("\\layout {}")
         printer.newline ()
         # If the --midi option was not passed to musicxml2ly, that comments the "midi" line
-        if not self.create_midi:
+        if self.create_midi:
+            printer.dump ("}")
+            printer.newline()
+            printer.dump("\\score {")
+            printer.newline ()
+            printer.dump("\\unfoldRepeats \\articulate {")
+            printer.newline ()
+            self.contents.print_ly(printer)
+            printer.dump("}")
+            printer.newline ()
+        else:
             printer.dump ("% To create MIDI output, uncomment the following line:")
             printer.newline ()
             printer.dump ("% ")
