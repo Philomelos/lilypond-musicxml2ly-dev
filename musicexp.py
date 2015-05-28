@@ -168,23 +168,26 @@ class Duration:
                 longer_dict = {-1: "breve", -2: "longa"}
             else:
                 longer_dict = {-1: "\\breve", -2: "\\longa"}
-            str = longer_dict.get(self.duration_log, "1")
+            dur_str = longer_dict.get(self.duration_log, "1")
         else:
-            str = '%d' % (1 << self.duration_log)
-        str += '.' * self.dots
+            dur_str = '%d' % (1 << self.duration_log)
+        dur_str += '.' * self.dots
 
         if factor <> Rational(1, 1):
             if factor.denominator() <> 1:
-                str += '*%d/%d' % (factor.numerator(), factor.denominator())
+                dur_str += '*%d/%d' % (factor.numerator(), factor.denominator())
             else:
-                str += '*%d' % factor.numerator()
+                dur_str += '*%d' % factor.numerator()
 
-        ly_dur = int(str)
-        return str
+        if dur_str.isdigit():
+            ly_dur = int(dur_str)
+        # TODO: We need to deal with dotted notes and scaled durations
+        # otherwise ly_dur won't work in combination with tremolos.
+        return dur_str
 
     def print_ly(self, outputter):
-        str = self.ly_expression(self.factor / outputter.duration_factor())
-        outputter.print_duration_string(str)
+        dur_str = self.ly_expression(self.factor / outputter.duration_factor())
+        outputter.print_duration_string(dur_str)
 
     def __repr__(self):
         return self.ly_expression()
@@ -1613,14 +1616,14 @@ class TremoloEvent(ArticulationEvent):
         self.strokes = 0
 
     def ly_expression(self):
-        str = ''
+        ly_str = ''
         if self.strokes and int(self.strokes) > 0:
             # ly_dur is a global variable defined in class Duration
             # ly_dur stores the value of the reciprocal values of notes
             # ly_dur is used here to check the current note duration
-            # if it is smaller than an 8th note, e.g.
+            # if the duration is smaller than 8, e.g.
             # quarter, half and whole notes,
-            # `:(2 ** (2 + number of tremolo strokes)'
+            # `:(2 ** (2 + number of tremolo strokes))'
             # should be appended to the pitch and duration, e.g.
             # 1 stroke: `c4:8' or `c2:8' or `c1:8'
             # 2 strokes: `c4:16' or `c2:16' or `c1:16'
@@ -1634,10 +1637,10 @@ class TremoloEvent(ArticulationEvent):
             # 2 strokes: `c8:32', `c16:64', `c32:128', ...
             # ... 
             if ly_dur < 8:
-                str += ':%s' % (2 ** (2 + int(self.strokes)))
+                ly_str += ':%s' % (2 ** (2 + int(self.strokes)))
             else:
-                str += ':%s' % (2 ** int((math.log(ly_dur, 2)) + int(self.strokes)))
-        return str
+                ly_str += ':%s' % (2 ** int((math.log(ly_dur, 2)) + int(self.strokes)))
+        return ly_str
 
 class BendEvent (ArticulationEvent):
     def __init__ (self):
