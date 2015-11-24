@@ -9,10 +9,10 @@ score = '''
     <measure>
         <attributes>
             <divisions>16</divisions>
-            <time> 
-                <beats>4</beats> 
-                <beat-type>4</beat-type> 
-            </time> 
+            <time>
+                <beats>4</beats>
+                <beat-type>4</beat-type>
+            </time>
         </attributes>
         <note>
             <pitch>
@@ -46,7 +46,3 @@ def test_breathing_sign():
     result = printer.score_dict['voices']
 
     assert trim(expected) == trim(result)
-
-        
-
-

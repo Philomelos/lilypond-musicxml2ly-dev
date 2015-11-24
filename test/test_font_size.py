@@ -20,10 +20,10 @@ direction = lambda fontsize, fontstyle: \
 '''
       <direction placement="above">
         <direction-type>
-	  <words font-family="CenturySchL" font-size="{fontsize}" font-weight="normal" font-style="{fontstyle}" relative-x="7.81" default-y="5.34">D.S. al Coda</words>
-	</direction-type>
-	<offset>-6720.00</offset>
-	<sound dalsegno="0"/>
+          <words font-family="CenturySchL" font-size="{fontsize}" font-weight="normal" font-style="{fontstyle}" relative-x="7.81" default-y="5.34">D.S. al Coda</words>
+        </direction-type>
+        <offset>-6720.00</offset>
+        <sound dalsegno="0"/>
       </direction>
 '''.format(fontsize=fontsize, fontstyle=fontstyle)
 
@@ -78,6 +78,3 @@ class TestFontSize:
 
     def test_extremely_large_font_size_with_number(self):
         self.font_size_test("32000", r'\huge')
-
-
-

@@ -24,7 +24,7 @@ might modify installed .pyc files.
 """
 
 for d in ['/usr/share/lilypond/2.19.3',
-	  '/usr/lib/lilypond/2.19.3']:
+          '/usr/lib/lilypond/2.19.3']:
     sys.path.insert(0, os.path.join(d, 'python'))
 
 # dynamic relocation, for GUB binaries.
@@ -48,7 +48,7 @@ options = None
 
 class Conversion_Settings:
     def __init__(self):
-       self.ignore_beaming = False 
+       self.ignore_beaming = False
        self.convert_stem_directions = False
        self.convert_rest_positions = True
 
@@ -59,7 +59,7 @@ conversion_settings = Conversion_Settings()
 layout_information = musicexp.Layout()
 # Use a global variable to store the setting needed inside a \paper block.
 paper = musicexp.Paper()
-    
+
 needed_additional_definitions = []
 additional_definitions = {
   "tuplet-note-wrapper": """      % a formatter function, which is simply a wrapper around an existing
@@ -105,8 +105,8 @@ def extract_paper_information(score_partwise):
         tn = scaling.get_maybe_exist_named_child('tenths')
         tn = float(tn.get_text())
         # The variable 'tenths' is actually a ratio, NOT the value of <tenths>.
-        # TODO: rename and replace. 
-        tenths = mm / tn 
+        # TODO: rename and replace.
+        tenths = mm / tn
         ratio = tenths / default_tenths_to_millimeters_ratio
         staff_size = default_staff_size * ratio
 
@@ -117,7 +117,7 @@ def extract_paper_information(score_partwise):
                 staff_size)
             warnings.warn(msg)
             paper.global_staff_size = 20
-        
+
     # We need the scaling(i.e. the size of staff tenths for everything!
     if tenths < 0:
         return None
@@ -436,7 +436,7 @@ def extract_score_structure(part_list, staffinfo):
             staff.sound = extract_instrument_sound(el)
         if staff.instrument_name:
             paper.indent = max(paper.indent, len(staff.instrument_name))
-            paper.instrument_names.append(staff.instrument_name) 
+            paper.instrument_names.append(staff.instrument_name)
         partdisplay = el.get_maybe_exist_named_child('part-abbreviation')
         if partdisplay:
             staff.short_instrument_name = partdisplay.get_text()
@@ -573,7 +573,7 @@ def rational_to_lily_duration(rational_len):
         d.factor = Rational(rational_len.numerator())
     else:
         ly.warning(_("Encountered rational duration with denominator %s, "
-                       "unable to convert to lilypond duration") % 
+                       "unable to convert to lilypond duration") %
                     rational_len.denominator())
         # TODO: Test the above error message
         return None
@@ -743,7 +743,7 @@ def group_tuplets(music_list, events):
     """Collect Musics from
     MUSIC_LIST demarcated by EVENTS_LIST in TimeScaledMusic objects.
     """
-    
+
     indices = []
     brackets = {}
 
@@ -796,11 +796,11 @@ def musicxml_time_to_lily(attributes):
     change = musicexp.TimeSignatureChange()
     # time signature function
     if hasattr(options, 'shift_meter') and options.shift_meter:
-	tmp_meter = options.shift_meter.split("/",1)
-	sig = [int(tmp_meter[0]), int(tmp_meter[1])]
-	change.originalFractions = attributes.get_time_signature()
+        tmp_meter = options.shift_meter.split("/",1)
+        sig = [int(tmp_meter[0]), int(tmp_meter[1])]
+        change.originalFractions = attributes.get_time_signature()
     else:
-	sig = attributes.get_time_signature()
+        sig = attributes.get_time_signature()
     if not sig:
         return None
     change.fractions = sig
@@ -1069,7 +1069,7 @@ def musicxml_fermata_to_lily_event(mxl_event):
     fermata_types= { "angled": "shortfermata",
                      "square": "longfermata" }
 
-    # MusicXML fermata types can be specified in two different ways: 
+    # MusicXML fermata types can be specified in two different ways:
     # 1. <fermata>angled</fermata> and
     # 2. <fermata type="angled"/> -- both need to be handled.
     if hasattr(mxl_event, 'type'):
@@ -1244,7 +1244,7 @@ def OrnamenthasWavyline(mxl_event):
             if i._name == "wavy-line": return True
     return False
 
-            
+
 def musicxml_articulation_to_lily_event(mxl_event):
     # wavy-line elements are treated as trill spanners, not as articulation ornaments
     if mxl_event.get_name() in articulation_spanners:
@@ -1709,17 +1709,17 @@ string_tunings = None
 def musicxml_get_string_tunings(lines):
     global string_tunings
     if (string_tunings == None):
-	if not lines:
-	    lines = 6
-	string_tunings = [musicexp.Pitch()] * lines
-	for i in range(0, lines):
-	    p = musicexp.Pitch()
-	    p.step = musicxml_step_to_lily(((("E","A","D","G","B")*(lines/5+1))[0:lines])[i])
-	    p.octave = (([-2+int(x%5>1)+2*(x/5) for x in range(0,lines)][0:lines])[i])
-	    p.alteration = 0
-	    p._force_absolute_pitch = True
-	    string_tunings[i] = p
-	string_tunings = string_tunings[::-1]
+        if not lines:
+            lines = 6
+        string_tunings = [musicexp.Pitch()] * lines
+        for i in range(0, lines):
+            p = musicexp.Pitch()
+            p.step = musicxml_step_to_lily(((("E","A","D","G","B")*(lines/5+1))[0:lines])[i])
+            p.octave = (([-2+int(x%5>1)+2*(x/5) for x in range(0,lines)][0:lines])[i])
+            p.alteration = 0
+            p._force_absolute_pitch = True
+            string_tunings[i] = p
+        string_tunings = string_tunings[::-1]
     return string_tunings[0:lines]
 
 def musicxml_frame_to_lily_event(frame):
@@ -1739,7 +1739,7 @@ def musicxml_frame_to_lily_event(frame):
         if fingering >= 0:
             el.append(fingering)
         ev.elements.append(el)
-	open_strings.remove(fn.get_string())
+        open_strings.remove(fn.get_string())
         b = fn.get_barre()
         if b == 'start':
             barre.append(el[0]) # start string
@@ -1747,7 +1747,7 @@ def musicxml_frame_to_lily_event(frame):
         elif b == 'stop':
             barre.insert(1, el[0]) # end string
     for string in open_strings:
-	ev.elements.append([string, 'x'])
+        ev.elements.append([string, 'x'])
     ev.elements.sort()
     ev.elements.reverse()
     if barre:
@@ -1766,24 +1766,24 @@ def musicxml_harmony_to_lily_fretboards(n):
     res = []
     frame = n.get_maybe_exist_named_child('frame')
     if frame:
-	strings = frame.get_strings()
-	if not strings:
-	    strings = 6
-	tunings = musicxml_get_string_tunings(strings)
-	ev = musicexp.FretBoardEvent()
-	#barre = []
-	for fn in frame.get_named_children('frame-note'):
-	    fbn = musicexp.FretBoardNote()
-	    string = fn.get_string()
-	    fbn.string = string
-	    fingering = fn.get_fingering()
-	    if fingering >= 0:
-		fbn.fingering = fingering
-	    p = tunings[string-1].copy()
-	    p.add_semitones(fn.get_fret())
-	    fbn.pitch = p
-	    ev.append(fbn)
-	res.append(ev)
+        strings = frame.get_strings()
+        if not strings:
+            strings = 6
+        tunings = musicxml_get_string_tunings(strings)
+        ev = musicexp.FretBoardEvent()
+        #barre = []
+        for fn in frame.get_named_children('frame-note'):
+            fbn = musicexp.FretBoardNote()
+            string = fn.get_string()
+            fbn.string = string
+            fingering = fn.get_fingering()
+            if fingering >= 0:
+                fbn.fingering = fingering
+            p = tunings[string-1].copy()
+            p.add_semitones(fn.get_fret())
+            fbn.pitch = p
+            ev.append(fbn)
+        res.append(ev)
     return res
 
 def musicxml_harmony_to_lily_chordname(n):
@@ -1997,7 +1997,7 @@ class LilyPondVoiceBuilder:
         if isinstance(music, musicexp.BarLine):
             if self.pending_dynamics:
                 for d in self.pending_dynamics:
-                    if not isinstance(d, (musicexp.SpanEvent, musicexp.DynamicsEvent)):       
+                    if not isinstance(d, (musicexp.SpanEvent, musicexp.DynamicsEvent)):
                         index = self.pending_dynamics.index(d)
                         dyn = self.pending_dynamics.pop(index)
                         self.elements.append(dyn)
@@ -2150,14 +2150,14 @@ def music_xml_fretboards_name_to_lily_name(part_id, voicename):
 
 def get_all_lyric_parts_in_voice(voice):
     '''
-    Collect the indexes of all lyric parts in this voice. 
+    Collect the indexes of all lyric parts in this voice.
     In case not all of the current lyric parts are active (a typical case would be
     a refrain/chorus), the current implementation inserts \skip-commands in the
     inactive parts to keep them in sync.
     '''
     all_lyric_parts = []
     for elem in voice._elements:
-        lyrics = elem.get_typed_children(musicxml.Lyric) 
+        lyrics = elem.get_typed_children(musicxml.Lyric)
         if lyrics:
             for lyric in lyrics:
                 index = lyric.number
@@ -2204,7 +2204,7 @@ def extract_lyrics(voice, lyric_key, lyrics_dict):
         # Note does not have any lyric attached to it.
         elif is_note_and_not_rest(elem):
             result.append('\skip1 ')
-        
+
     lyrics_dict[lyric_key].extend(result)
 
 def musicxml_voice_to_lily_voice(voice):
@@ -2282,7 +2282,7 @@ def musicxml_voice_to_lily_voice(voice):
                 voice_builder.correct_negative_skip(n._when)
                 figured_bass_builder.correct_negative_skip(n._when)
                 chordnames_builder.correct_negative_skip(n._when)
-		fretboards_builder.correct_negative_skip(n._when)
+                fretboards_builder.correct_negative_skip(n._when)
                 n.message(_("Negative skip found: from %s to %s, difference is %s") % (neg.here, neg.dest, neg.dest - neg.here))
 
         if isinstance(n, musicxml.Barline):
@@ -2326,7 +2326,7 @@ def musicxml_voice_to_lily_voice(voice):
                 fretboards_builder.add_bar_check(num)
 
         if isinstance(n, musicxml.Direction):
-            # check if Direction already has been converted in another voice. 
+            # check if Direction already has been converted in another voice.
             if n.converted:
                 continue
             else:
@@ -2336,7 +2336,7 @@ def musicxml_voice_to_lily_voice(voice):
                         voice_builder.add_dynamics(direction)
                     else:
                         voice_builder.add_command(direction)
-                continue  
+                continue
 
         # Start any new multimeasure rests
         if (rest and rest.is_whole_measure()):
@@ -2350,21 +2350,21 @@ def musicxml_voice_to_lily_voice(voice):
                 fretboards_builder.jumpto(n._when)
                 fretboards_builder.stay_here = True
             voice_builder.add_multibar_rest(n._duration)
-            continue 
+            continue
 
         if isinstance(n, musicxml.Harmony):
-	    if (options.fretboards):
-		# Makes fretboard diagrams in a separate FretBoards voice
-		for a in musicxml_harmony_to_lily_fretboards(n):
-		    pending_fretboards.append(a)
-	    else:
-		# Makes markup fretboard-diagrams inside the voice
-		for a in musicxml_harmony_to_lily(n):
-		    if a.wait_for_note():
-			voice_builder.add_dynamics(a)
-		    else:
-			voice_builder.add_command(a)
-	    for a in musicxml_harmony_to_lily_chordname(n):
+            if (options.fretboards):
+                # Makes fretboard diagrams in a separate FretBoards voice
+                for a in musicxml_harmony_to_lily_fretboards(n):
+                    pending_fretboards.append(a)
+            else:
+                # Makes markup fretboard-diagrams inside the voice
+                for a in musicxml_harmony_to_lily(n):
+                    if a.wait_for_note():
+                        voice_builder.add_dynamics(a)
+                    else:
+                        voice_builder.add_command(a)
+            for a in musicxml_harmony_to_lily_chordname(n):
                 pending_chordnames.append(a)
             continue
 
@@ -2480,7 +2480,7 @@ def musicxml_voice_to_lily_voice(voice):
                 chordnames_builder.add_music(cn, ev_chord.get_length())
             pending_chordnames = []
 
-	if pending_fretboards:
+        if pending_fretboards:
             try:
                 fretboards_builder.jumpto(n._when)
                 if (fretboards_builder.stay_here):
@@ -2631,11 +2631,11 @@ def musicxml_voice_to_lily_voice(voice):
     if hasattr(options, 'shift_meter') and options.shift_meter:
         for event in voice_builder.elements:
             if isinstance(event, musicexp.TimeSignatureChange):
-        	sd = []
-        	for i in range(0,5):
-        	    sd.append(musicexp.ShiftDurations())
-        	    sd[i].set_shift_durations_parameters(event)
-        	break;
+                sd = []
+                for i in range(0,5):
+                    sd.append(musicexp.ShiftDurations())
+                    sd[i].set_shift_durations_parameters(event)
+                break;
 
     ly_voice = group_tuplets(voice_builder.elements, tuplet_events)
     ly_voice = group_repeats(ly_voice)
@@ -2681,10 +2681,10 @@ def musicxml_voice_to_lily_voice(voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'figuremode'
         v.element = fbass_music
-	if hasattr(options, 'shift_meter') and options.shift_meter:
-	    sd[-1].element = v
-	    v = sd[-1]
-	    sd.pop()
+        if hasattr(options, 'shift_meter') and options.shift_meter:
+            sd[-1].element = v
+            v = sd[-1]
+            sd.pop()
         return_value.figured_bass = v
 
     # create \chordmode { chords }
@@ -2694,10 +2694,10 @@ def musicxml_voice_to_lily_voice(voice):
         v = musicexp.ModeChangingMusicWrapper()
         v.mode = 'chordmode'
         v.element = cname_music
-	if hasattr(options, 'shift_meter') and options.shift_meter:
-	    sd[-1].element = v
-	    v = sd[-1]
-	    sd.pop()
+        if hasattr(options, 'shift_meter') and options.shift_meter:
+            sd[-1].element = v
+            v = sd[-1]
+            sd.pop()
         return_value.chordnames = v
 
     # create diagrams for FretBoards engraver
@@ -2706,10 +2706,10 @@ def musicxml_voice_to_lily_voice(voice):
         fboard_music.elements = group_repeats(fretboards_builder.elements)
         v = musicexp.MusicWrapper()
         v.element = fboard_music
-	if hasattr(options, 'shift_meter') and options.shift_meter:
-	    sd[-1].element = v
-	    v = sd[-1]
-	    sd.pop()
+        if hasattr(options, 'shift_meter') and options.shift_meter:
+            sd[-1].element = v
+            v = sd[-1]
+            sd.pop()
         return_value.fretboards = v
 
     # coll = []
@@ -2721,7 +2721,7 @@ def musicxml_voice_to_lily_voice(voice):
     #         pending.append(elt)
     #     else:
     #         coll.append(elt)
-                
+
     # if pending:
     #     coll.extend(pending)
 
@@ -2796,14 +2796,14 @@ If the given filename is -, musicxml2ly reads from the command line.
                  help=_("show this help and exit"))
 
     p.version = ('''%prog (dev) v0.2.41\n\n'''
-+ 
++
 _ ("""Copyright (c) 2005--2015 by
     Han-Wen Nienhuys <hanwen@xs4all.nl>,
     Jan Nieuwenhuizen <janneke@gnu.org> and
     Reinhold Kainhofer <reinhold@kainhofer.com>
     Patrick L. Schmidt <pls@philomelos.net>
 """
-+ 
++
 """
 This program is free software.  It is covered by the GNU General Public
 License and you are welcome to change it and/or distribute copies of it
@@ -2917,7 +2917,7 @@ information.""") % 'lilypond')
                   default=False,
                   dest="midi",
                   help=_("activate midi-block in .ly file"))
-    
+
     # transpose function
     p.add_option('--transpose',
                   metavar=_ ("TOPITCH"),
@@ -3294,4 +3294,3 @@ def main():
     else:
         ly.error(_("Unable to find input file %s") % basefilename)
         sys.exit(1)
-

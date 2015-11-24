@@ -11,19 +11,19 @@ header = '''
   <part id="P1">
     <measure number="1">
       <attributes>
-	<divisions>2</divisions>
-	<key>
-	  <fifths>0</fifths>
-	  <mode>major</mode>
-	</key>
-	<time symbol="common">
-	  <beats>4</beats>
-	  <beat-type>4</beat-type>
-	</time>
-	<clef>
-	  <sign>G</sign>
-	  <line>2</line>
-	</clef>
+        <divisions>2</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
       </attributes>'''
 
 note_header = '''

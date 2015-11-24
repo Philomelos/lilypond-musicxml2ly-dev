@@ -4,7 +4,7 @@ score = '''
 <score-partwise>
     <identification>
       <creator type="composer">John Francis Wade (1711-1786)</creator>
-      <creator type="lyricist">German: Friedrich Heinrich Ranke (1798-1876) 
+      <creator type="lyricist">German: Friedrich Heinrich Ranke (1798-1876)
 Latin: John Francis Wade (1711-1786)</creator>
     </identification>
     <part-list>

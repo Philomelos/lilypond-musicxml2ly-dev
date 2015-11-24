@@ -45,19 +45,19 @@ def main():
                     ly_to_pdf_data = ly_to_pdf.communicate()
                     passed.append(filename)
                     if not xml_to_ly.returncode == 0 or not ly_to_pdf.returncode == 0:
-                        log.write('\n') 
+                        log.write('\n')
                         log.write('****************************************************')
-                        log.write('\n') 
+                        log.write('\n')
                         log.write('FAILURE')
-                        log.write('\n') 
+                        log.write('\n')
                         log.write('****************************************************')
-                        log.write('\n') 
+                        log.write('\n')
                     else:
-                        log.write('\n') 
+                        log.write('\n')
                         log.write('----------------------------------------------------')
-                        log.write('\n') 
+                        log.write('\n')
                     log.write(filename)
-                    log.write('\n') 
+                    log.write('\n')
                     for line in xml_to_ly_data[1]:
                         sys.stdout.write(line)
                         log.write(line)
@@ -65,7 +65,7 @@ def main():
                         sys.stdout.write(line)
                         log.write(line)
                     failed.append(filename)
-                    log.write('\n') 
+                    log.write('\n')
             except KeyboardInterrupt:
                 break
 

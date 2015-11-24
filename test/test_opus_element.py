@@ -39,7 +39,3 @@ def test_work_number_and_work_title():
     result = printer.score_dict['header']
 
     assert trim(expected) == trim(result)
-
-        
-
-

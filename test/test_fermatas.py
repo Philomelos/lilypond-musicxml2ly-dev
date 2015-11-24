@@ -36,9 +36,6 @@ class TestFermata:
         printer = xml_to_printer_object(self.xml)
 
         expected = r'''PartPOneVoiceOne = {a'1\shortfermata }'''
-        result = printer.score_dict['voices'] 
+        result = printer.score_dict['voices']
 
         assert trim(expected) == trim(result)
-        
-
-

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 import new
 import string
 from rational import *
@@ -123,7 +123,7 @@ class Music_xml_node(Xml_node):
         Xml_node.__init__(self)
         self.duration = Rational(0)
         self.start = Rational(0)
-        self.converted = False 
+        self.converted = False
 
 
 class Music_xml_spanner(Music_xml_node):
@@ -275,7 +275,7 @@ class Identification(Xml_node):
             misc_fields = m.get_named_children('miscellaneous-field')
             for mf in misc_fields:
                 if hasattr(mf, 'name') and mf.name == 'description':
-                    return mf.get_text() 
+                    return mf.get_text()
         return None
 
 
@@ -426,7 +426,7 @@ class Unpitched(Music_xml_node):
             octave = ch.get_text().strip()
             return int(octave)
         else:
-            return None 
+            return None
 
     def to_lily_object(self):
         p = None
@@ -668,7 +668,7 @@ class Stem(Music_xml_node):
         if(style_elm.color != None):
             styles.append(style_elm)
         return styles
-        
+
 
 class Notehead(Music_xml_node):
 
@@ -950,12 +950,12 @@ class Syllabic(Music_xml_node):
 class Lyric(Music_xml_node):
 
     def get_number(self):
-	"""
-	Return the number attribute(if it exists) of the lyric element.
+        """
+        Return the number attribute(if it exists) of the lyric element.
 
-	@rtype: number
-	@return: The value of the number attribute
-	"""
+        @rtype: number
+        @return: The value of the number attribute
+        """
         if hasattr(self, 'number'):
             return self.number
         else:
@@ -965,13 +965,13 @@ class Lyric(Music_xml_node):
 class Sound(Music_xml_node):
 
     def get_tempo(self):
-	"""
-	Return the tempo attribute(if it exists) of the sound element.
-	This attribute can be used by musicxml2ly for the midi output(see L{musicexp.Score}).
+        """
+        Return the tempo attribute(if it exists) of the sound element.
+        This attribute can be used by musicxml2ly for the midi output(see L{musicexp.Score}).
 
-	@rtype: string
-	@return: The value of the tempo attribute
-	"""
+        @rtype: string
+        @return: The value of the tempo attribute
+        """
         if hasattr(self, 'tempo'):
             return self.tempo
         else:
@@ -1046,7 +1046,7 @@ class Tuplet(Music_xml_spanner):
     def get_tuplet_note_count(self, tuplet_note):
         if tuplet_note:
             tuplet_nr = tuplet_note.get_maybe_exist_named_child('tuplet-number')
-            if tuplet_nr: 
+            if tuplet_nr:
                 return int(tuplet_nr.get_text())
         return None
 
@@ -1367,7 +1367,7 @@ class Part(Music_xml_node):
                     n._prev_measure_position = last_measure_position
                 # After-graces are placed at the same position as the previous note
                 if isinstance(n, Note) and  n.is_after_grace():
-                    # TODO: We should do the same for grace notes at the end of 
+                    # TODO: We should do the same for grace notes at the end of
                     # a measure with no following note!!!
                     n._when = last_moment
                     n._measure_position = last_measure_position
@@ -1502,8 +1502,8 @@ class Part(Music_xml_node):
             if(id != "None"):
                 last_voice = id
 
-            # We don't need backup/forward any more, since we have already 
-            # assigned the correct onset times. 
+            # We don't need backup/forward any more, since we have already
+            # assigned the correct onset times.
             # TODO: Let Grouping through. Also: link, print, bokmark sound
             if not(isinstance(n, Note) or isinstance(n, Attributes) or
                     isinstance(n, Direction) or isinstance(n, Partial) or
@@ -1542,13 +1542,13 @@ class Part(Music_xml_node):
                 continue
 
             if isinstance(n, Harmony) or isinstance(n, FiguredBass):
-                # store the harmony or figured bass element until we encounter 
+                # store the harmony or figured bass element until we encounter
                 # the next note and assign it only to that one voice.
                 assign_to_next_note.append(n)
                 continue
 
             if hasattr(n, 'print-object') and getattr(n, 'print-object') == "no":
-                #Skip this note. 
+                #Skip this note.
                 pass
             else:
                 for i in assign_to_next_note:

@@ -49,6 +49,3 @@ class TestIdentificationRightsTag:
         expected = r'''\header {copyright = "Arrangement: X.Y." }'''
         result = printer.score_dict['header']
         assert trim(expected) == trim(result)
-
-
-

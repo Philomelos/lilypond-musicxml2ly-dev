@@ -12,7 +12,7 @@ class TestPrinter(musicexp.Output_printer):
         self.current_section = None
 
     def newline(self):
-        self.temp += (self._line + '\n') 
+        self.temp += (self._line + '\n')
         self._line = ' ' * self._indent * self._nesting
         self.skipspace = True
 
@@ -74,5 +74,3 @@ def xml_to_printer_object(string):
     printer.newline ()
 
     return printer
-
-
